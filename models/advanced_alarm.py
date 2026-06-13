@@ -32,7 +32,13 @@ class AdvancedAlarm(models.Model):
         ('cancel', 'Cancelled')
     ], string='Status', default='pending', required=True, index=True)
     
-    sound_id = fields.Many2one('advanced.alarm.sound', string='Ringtone')
+    def _default_sound_id(self):
+        user_sound = self.env.user.alarm_sound_id
+        if user_sound:
+            return user_sound.id
+        return self.env.company.advanced_alarm_sound_id.id
+
+    sound_id = fields.Many2one('advanced.alarm.sound', string='Ringtone', default=_default_sound_id, domain="[('sound_type', '=', 'alarm')]")
     
     pre_alarm = fields.Boolean(string='Enable Pre-alarm', default=True)
     pre_alarm_duration = fields.Integer(string='Pre-alarm Time (Minutes)', default=5)

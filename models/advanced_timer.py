@@ -31,7 +31,13 @@ class AdvancedTimer(models.Model):
     start_time = fields.Datetime(string='Start Time')
     paused_time = fields.Datetime(string='Paused Time')
     accumulated_paused = fields.Integer(string='Accumulated Paused (Seconds)', default=0)
-    sound_id = fields.Many2one('advanced.alarm.sound', string='Sound')
+    def _default_sound_id(self):
+        user_sound = self.env.user.timer_sound_id
+        if user_sound:
+            return user_sound.id
+        return self.env.company.advanced_timer_sound_id.id
+
+    sound_id = fields.Many2one('advanced.alarm.sound', string='Sound', default=_default_sound_id, domain="[('sound_type', '=', 'timer')]")
 
     @api.depends('duration')
     def _compute_duration_parts(self):

@@ -30,5 +30,6 @@ class ResConfigSettings(models.TransientModel):
     snooze_limit = fields.Integer(string='Default Snooze Limit (Times)', default=3, config_parameter='advanced_alarms.snooze_limit')
     stopwatch_alert_interval = fields.Integer(string='Default Stopwatch Alert Interval (Seconds)', default=3600, config_parameter='advanced_alarms.stopwatch_alert_interval')
 
-    advanced_timer_sound_id = fields.Many2one('advanced.alarm.sound', related='company_id.advanced_timer_sound_id', readonly=False)
-    advanced_notif_sound_id = fields.Many2one('advanced.alarm.sound', related='company_id.advanced_notif_sound_id', readonly=False)
+    advanced_alarm_sound_id = fields.Many2one('advanced.alarm.sound', related='company_id.advanced_alarm_sound_id', readonly=False, domain="[('sound_type', '=', 'alarm')]")
+    advanced_timer_sound_id = fields.Many2one('advanced.alarm.sound', related='company_id.advanced_timer_sound_id', readonly=False, domain="[('sound_type', '=', 'timer')]")
+    advanced_notif_sound_id = fields.Many2one('advanced.alarm.sound', related='company_id.advanced_notif_sound_id', readonly=False, domain="[('sound_type', '=', 'notif')]")
