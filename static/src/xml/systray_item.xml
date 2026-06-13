@@ -10,7 +10,7 @@
 -->
 <templates xml:space="preserve">
     <t t-name="advanced_alarms.SystrayItem">
-        <Dropdown position="'bottom-end'" autoOpen="false" beforeOpen.bind="onBeforeOpen" menuClass="'o_advanced_alarms_dropdown_menu p-0'" class="'o_advanced_alarms_systray_dropdown'">
+        <Dropdown position="'bottom-end'" beforeOpen.bind="onBeforeOpen" menuClass="'o_advanced_alarms_dropdown_menu p-0'">
             <div t-att-class="{'o_advanced_alarms_systray': true, 'ringing': state.hasActiveRinging}">
                 <i class="fa fa-bell" role="img" aria-label="Alarms &amp; Time"></i>
                 <span t-if="state.counter > 0" class="badge rounded-pill"><t t-esc="state.counter"/></span>
