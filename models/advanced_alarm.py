@@ -355,7 +355,7 @@ class AdvancedAlarm(models.Model):
         alarms = self.search([
             '|', 
             ('user_id', '=', self.env.user.id),
-            ('group_ids', 'in', self.env.user.groups_id.ids),
+            ('group_ids', 'in', self.env.user.group_ids.ids),
             ('alarm_time', '>=', utc_start),
             ('alarm_time', '<=', utc_end)
         ])
