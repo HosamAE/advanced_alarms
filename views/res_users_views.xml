@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Advanced Alarms & Time Management — Odoo 17
+    Copyright (c) 2024-2026 HosamAE (Hossam A. Eissa)
+    Email   : HossamA.Eissa@gmail.com
+    LinkedIn: https://www.linkedin.com/in/hossameldeen-eissa/
+
+    Licensed under the Custom Attribution License — see LICENSE file.
+    Free to use and modify; NOT allowed to re-publish under a different author name.
+-->
+<odoo>
+    <!-- Inherit res.users form view to add preference settings -->
+    <!-- Inherit res.users form view to add preference settings -->
+    <record id="view_users_form_inherit_alarms" model="ir.ui.view">
+        <field name="name">res.users.form.inherit.alarms</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Alarms &amp; Sounds" name="time_alarms">
+                    <group string="Sound Preferences">
+                        <group>
+                            <field name="alarm_sound_id"/>
+                            <field name="timer_sound_id"/>
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+
+    <!-- Inherit user preferences view (Simple Modif form) -->
+    <record id="view_users_form_simple_modif_inherit_alarms" model="ir.ui.view">
+        <field name="name">res.users.preferences.form.inherit.alarms</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+        <field name="arch" type="xml">
+            <group name="preferences" position="after">
+                <group string="Time &amp; Alarms Sound Settings">
+                    <group>
+                        <field name="alarm_sound_id"/>
+                        <field name="timer_sound_id"/>
+                    </group>
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>

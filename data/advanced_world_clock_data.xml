@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Advanced Alarms & Time Management — Odoo 17
+    Copyright (c) 2024-2026 HosamAE (Hossam A. Eissa)
+    Email   : HossamA.Eissa@gmail.com
+    LinkedIn: https://www.linkedin.com/in/hossameldeen-eissa/
+
+    Licensed under the Custom Attribution License — see LICENSE file.
+    Free to use and modify; NOT allowed to re-publish under a different author name.
+-->
+<odoo>
+    <data noupdate="1">
+        
+        <!-- Cairo, Egypt -->
+        <record id="world_clock_cairo" model="advanced.world.clock">
+            <field name="name">Cairo (Egypt)</field>
+            <field name="timezone">Africa/Cairo</field>
+            <field name="dst_mode">auto</field>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- Riyadh, Saudi Arabia -->
+        <record id="world_clock_riyadh" model="advanced.world.clock">
+            <field name="name">Riyadh (Saudi Arabia)</field>
+            <field name="timezone">Asia/Riyadh</field>
+            <field name="dst_mode">auto</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- Dubai, UAE -->
+        <record id="world_clock_dubai" model="advanced.world.clock">
+            <field name="name">Dubai (UAE)</field>
+            <field name="timezone">Asia/Dubai</field>
+            <field name="dst_mode">auto</field>
+            <field name="sequence">30</field>
+        </record>
+
+        <!-- London, UK -->
+        <record id="world_clock_london" model="advanced.world.clock">
+            <field name="name">London (UK)</field>
+            <field name="timezone">Europe/London</field>
+            <field name="dst_mode">auto</field>
+            <field name="sequence">40</field>
+        </record>
+
+        <!-- New York, USA -->
+        <record id="world_clock_new_york" model="advanced.world.clock">
+            <field name="name">New York (USA)</field>
+            <field name="timezone">America/New_York</field>
+            <field name="dst_mode">auto</field>
+            <field name="sequence">50</field>
+        </record>
+
+        <!-- Tokyo, Japan -->
+        <record id="world_clock_tokyo" model="advanced.world.clock">
+            <field name="name">Tokyo (Japan)</field>
+            <field name="timezone">Asia/Tokyo</field>
+            <field name="dst_mode">auto</field>
+            <field name="sequence">60</field>
+        </record>
+
+        <!-- Sydney, Australia -->
+        <record id="world_clock_sydney" model="advanced.world.clock">
+            <field name="name">Sydney (Australia)</field>
+            <field name="timezone">Australia/Sydney</field>
+            <field name="dst_mode">auto</field>
+            <field name="sequence">70</field>
+        </record>
+
+    </data>
+</odoo>

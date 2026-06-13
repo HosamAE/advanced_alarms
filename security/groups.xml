@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Advanced Alarms & Time Management — Odoo 17
+    Copyright (c) 2024-2026 HosamAE (Hossam A. Eissa)
+    Email   : HossamA.Eissa@gmail.com
+    LinkedIn: https://www.linkedin.com/in/hossameldeen-eissa/
+
+    Licensed under the Custom Attribution License — see LICENSE file.
+    Free to use and modify; NOT allowed to re-publish under a different author name.
+-->
+<odoo>
+    <data noupdate="0">
+        <record id="module_category_advanced_alarms" model="ir.module.category">
+            <field name="name">Advanced Alarms</field>
+            <field name="description">Helps you manage advanced alarms access.</field>
+            <field name="sequence">100</field>
+        </record>
+
+        <record id="group_alarm_manager" model="res.groups">
+            <field name="name">Alarm Manager</field>
+            <field name="category_id" ref="module_category_advanced_alarms"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">The user will be able to access the Alarms Application Menu and manage alarms.</field>
+        </record>
+    </data>
+</odoo>

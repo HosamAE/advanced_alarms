@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Advanced Alarms & Time Management — Odoo 17
+    Copyright (c) 2024-2026 HosamAE (Hossam A. Eissa)
+    Email   : HossamA.Eissa@gmail.com
+    LinkedIn: https://www.linkedin.com/in/hossameldeen-eissa/
+
+    Licensed under the Custom Attribution License — see LICENSE file.
+    Free to use and modify; NOT allowed to re-publish under a different author name.
+-->
+<templates xml:space="preserve">
+    <t t-name="advanced_alarms.SystrayItem">
+        <Dropdown position="'bottom-end'" autoOpen="false" beforeOpen.bind="onBeforeOpen" menuClass="'o_advanced_alarms_dropdown_menu p-0'" class="'o_advanced_alarms_systray_dropdown'">
+            <t t-set-slot="toggler">
+                <div t-att-class="{'o_advanced_alarms_systray': true, 'ringing': state.hasActiveRinging}">
+                    <i class="fa fa-bell" role="img" aria-label="Alarms &amp; Time"></i>
+                    <span t-if="state.counter > 0" class="badge rounded-pill"><t t-esc="state.counter"/></span>
+                </div>
+            </t>
+            <t t-set-slot="default">
+                <div class="o_advanced_alarms_dropdown">
+                    <!-- Dropdown Header -->
+                    <div class="dropdown-header-custom">
+                        <div class="tabs-header">
+                            <button t-att-class="{'tab-btn': true, 'active': state.activeTab === 'alarm'}" t-on-click="() => this.switchTab('alarm')" title="Alarms">
+                                <i class="fa fa-bell"></i>
+                            </button>
+                            <button t-att-class="{'tab-btn': true, 'active': state.activeTab === 'world_clock'}" t-on-click="() => this.switchTab('world_clock')" title="World Clock">
+                                <i class="fa fa-globe"></i>
+                            </button>
+                            <button t-att-class="{'tab-btn': true, 'active': state.activeTab === 'timer'}" t-on-click="() => this.switchTab('timer')" title="Timers">
+                                <i class="fa fa-hourglass-end"></i>
+                            </button>
+                            <button t-att-class="{'tab-btn': true, 'active': state.activeTab === 'stopwatch'}" t-on-click="() => this.switchTab('stopwatch')" title="Stopwatches">
+                                <i class="fa fa-clock-o"></i>
+                            </button>
+                        </div>
+                        <div class="header-actions d-flex align-items-center gap-2">
+                            <button t-if="(state.activeTab === 'alarm' || state.activeTab === 'timer' || state.activeTab === 'stopwatch') and state.userSettings.is_alarm_manager" class="btn-add-alarm" t-on-click="onCreateNew">
+                                Create New
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tab Content Area -->
+                    <div class="tab-content-area">
+                        <!-- ALARM TAB -->
+                        <div t-if="state.activeTab === 'alarm'" class="tab-pane">
+                            <div t-if="state.old_muted_count and state.old_muted_count > 10" class="alert alert-warning p-2 mb-2 d-flex justify-content-between align-items-center" role="alert" style="font-size: 0.8rem;">
+                                <div>
+                                    <i class="fa fa-exclamation-triangle me-1"></i>
+                                    You have <t t-esc="state.old_muted_count"/> old muted alarms. Please clean them up to save space.
+                                </div>
+                                <button class="btn btn-sm btn-outline-danger py-0 px-2" t-on-click.stop="clearAllMuted">Clear</button>
+                            </div>
+                            <div t-if="state.alarms.length === 0" class="empty-state">
+                                <i class="fa fa-bell-slash"></i>
+                                <span>No alarms scheduled for today.</span>
+                            </div>
+                            <t t-foreach="state.alarms" t-as="alarm" t-key="alarm.id">
+                                <div t-attf-class="alarm-item-card type-#{alarm.recurrence_type} #{alarm.is_critical ? 'critical' : ''} #{alarm.state === 'done' || alarm.state === 'muted' ? 'muted-state' : ''}" t-on-click="() => this.openRecord('advanced.alarm', alarm.id)">
+                                    <div class="item-info">
+                                        <div class="item-title" t-esc="alarm.name"/>
+                                        <div class="item-time">
+                                            <i class="fa fa-calendar-check-o"></i>
+                                            <span t-esc="formatAlarmTime(alarm.alarm_time)"/>
+                                            <t t-if="alarm.res_name">
+                                                <span>•</span>
+                                                <span class="badge bg-secondary cursor-pointer ms-1" t-on-click.stop="() => this.openLinkedRecord(alarm.res_model, alarm.res_id)">
+                                                    <i class="fa fa-link me-1"></i>
+                                                    <span t-esc="alarm.res_name"/>
+                                                </span>
+                                            </t>
+                                        </div>
+                                    </div>
+                                    <div class="item-actions">
+                                        <button t-if="alarm.state !== 'done' &amp;&amp; alarm.state !== 'muted'" class="btn-done" title="Done" t-on-click.stop="() => this.markAlarmDone(alarm.id)">
+                                            <i class="fa fa-check text-success"></i>
+                                        </button>
+                                        <button t-if="alarm.state !== 'done' &amp;&amp; alarm.state !== 'muted'" class="btn-mute" title="Mute" t-on-click.stop="() => this.muteAlarm(alarm.id)">
+                                            <i class="fa fa-volume-off text-muted"></i>
+                                        </button>
+                                        <button class="btn-delete" title="Delete" t-on-click.stop="() => this.deleteAlarm(alarm.id)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- WORLD CLOCK TAB -->
+                        <div t-if="state.activeTab === 'world_clock'" class="tab-pane">
+                            <div t-attf-class="world-clock-main text-center p-3 mb-3 rounded border cursor-pointer #{isClockFloating('local') ? 'border-primary bg-light' : 'bg-white'}" t-on-click="() => this.toggleFloatingClock('local')">
+                                <div class="digital-clock-large fw-bold fs-2 text-primary" t-esc="state.floatingClockTime"/>
+                                <div class="digital-clock-date text-muted fs-6" t-esc="state.floatingClockDate"/>
+                                <div class="mt-2 text-primary fs-7 fw-semibold">
+                                    <i t-attf-class="fa #{isClockFloating('local') ? 'fa-eye' : 'fa-eye-slash'} me-1"></i>
+                                    <t t-if="isClockFloating('local')">Floating On Screen</t>
+                                    <t t-else="">Pin to Screen</t>
+                                </div>
+                            </div>
+                            <div class="world-clock-cities">
+                                <div class="fs-6 fw-bold mb-2 text-muted px-1">Other Cities</div>
+                                <t t-foreach="state.worldClocks" t-as="city" t-key="city.id">
+                                    <div t-attf-class="city-time-card d-flex justify-content-between align-items-center p-2 mb-2 rounded border cursor-pointer #{isClockFloating(city.id) ? 'border-primary bg-light' : 'bg-white'}" t-on-click="() => this.toggleFloatingClock(city.id)">
+                                        <div class="city-info">
+                                            <div class="city-name fw-semibold" t-esc="city.name"/>
+                                            <div class="city-offset text-muted" style="font-size: 0.75rem;" t-esc="getCityOffset(city.tz)"/>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="city-time fw-bold text-dark fs-5" t-esc="getCityTime(city.tz, city.dstOffset)"/>
+                                            <i t-attf-class="fa #{isClockFloating(city.id) ? 'fa-thumb-tack text-primary' : 'fa-thumb-tack text-muted'}" style="font-size: 0.95rem;"></i>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+
+                        <!-- TIMER TAB -->
+                        <div t-if="state.activeTab === 'timer'" class="tab-pane">
+                            <div t-if="state.timers.length === 0" class="empty-state">
+                                <i class="fa fa-hourglass-o"></i>
+                                <span>No active timers.</span>
+                            </div>
+                            <t t-foreach="state.timers" t-as="timer" t-key="timer.id">
+                                <div t-attf-class="alarm-item-card #{timer.state === 'done' ? 'muted-state' : ''}" t-on-click="() => this.openRecord('advanced.timer', timer.id)">
+                                    <div class="item-info">
+                                        <div class="item-title" t-esc="timer.name"/>
+                                        <div class="item-time">
+                                            <i class="fa fa-hourglass-o"></i>
+                                            <span t-esc="getTimerDisplay(timer)"/>
+                                            <span>•</span>
+                                            <span class="text-truncate fw-semibold" t-esc="timer.state.toUpperCase()"/>
+                                        </div>
+                                    </div>
+                                    <div class="item-actions">
+                                        <button t-if="timer.state !== 'running' &amp;&amp; timer.state !== 'done'" class="btn-done" title="Start" t-on-click.stop="() => this.startTimer(timer.id)">
+                                            <i class="fa fa-play text-success"></i>
+                                        </button>
+                                        <button t-if="timer.state === 'running'" class="btn-mute" title="Pause" t-on-click.stop="() => this.pauseTimer(timer.id)">
+                                            <i class="fa fa-pause text-warning"></i>
+                                        </button>
+                                        <button t-if="timer.state !== 'draft'" class="btn-mute" title="Reset" t-on-click.stop="() => this.resetTimer(timer.id)">
+                                            <i class="fa fa-refresh text-muted"></i>
+                                        </button>
+                                        <button class="btn-delete" title="Delete" t-on-click.stop="() => this.deleteTimer(timer.id)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- STOPWATCH TAB -->
+                        <div t-if="state.activeTab === 'stopwatch'" class="tab-pane">
+                            <div t-if="state.stopwatches.length === 0" class="empty-state">
+                                <i class="fa fa-clock-o"></i>
+                                <span>No active stopwatches.</span>
+                            </div>
+                            <t t-foreach="state.stopwatches" t-as="sw" t-key="sw.id">
+                                <div class="timer-item-card" t-on-click="() => this.openRecord('advanced.stopwatch', sw.id)">
+                                    <div class="timer-header">
+                                        <span t-esc="sw.name"/>
+                                        <span class="text-muted" style="font-size: 0.75rem;" t-esc="sw.state.toUpperCase()"/>
+                                    </div>
+
+
+                                    <div class="timer-display" t-esc="getStopwatchDisplay(sw)"/>
+                                    <div class="timer-controls" t-on-click.stop="">
+                                        <button t-if="sw.state !== 'running'" class="btn-primary-action" t-on-click="() => this.startStopwatch(sw.id)">
+                                            <i class="fa fa-play"></i> Start
+                                        </button>
+                                        <button t-if="sw.state === 'running'" class="btn-secondary" t-on-click="() => this.pauseStopwatch(sw.id)">
+                                            <i class="fa fa-pause"></i> Pause
+                                        </button>
+                                        <button t-if="sw.state === 'running'" class="btn-secondary" t-on-click="() => this.lapStopwatch(sw.id)">
+                                            <i class="fa fa-flag"></i> Split / Lap
+                                        </button>
+                                        <button class="btn-secondary" t-on-click="() => this.resetStopwatch(sw.id)">
+                                            <i class="fa fa-refresh"></i> Reset
+                                        </button>
+                                        <button class="btn-delete" t-on-click="() => this.deleteStopwatch(sw.id)">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Split / Lap times rendering -->
+                                    <div t-if="sw.split_times_parsed &amp;&amp; sw.split_times_parsed.length > 0" class="stopwatch-laps-container mt-2 border-top pt-2" t-on-click.stop="">
+                                        <div class="fw-semibold text-muted mb-1" style="font-size: 0.75rem;">Laps / Splits</div>
+                                        <div class="stopwatch-laps-list" style="max-height: 120px; overflow-y: auto; font-size: 0.75rem;">
+                                            <table class="table table-sm table-borderless m-0">
+                                                <thead>
+                                                    <tr class="text-muted border-bottom" style="font-size: 0.7rem;">
+                                                        <th>Lap</th>
+                                                        <th>Lap Time</th>
+                                                        <th class="text-end">Total Time</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-foreach="getStopwatchLaps(sw)" t-as="lap" t-key="lap.index">
+                                                        <tr t-attf-class="#{lap.index % 2 === 0 ? 'bg-light' : ''}">
+                                                            <td class="fw-bold text-muted">#<t t-esc="lap.index"/></td>
+                                                            <td class="text-primary font-monospace"><t t-esc="lap.lapTime"/></td>
+                                                            <td class="text-end font-monospace fw-bold"><t t-esc="lap.totalTime"/></td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </Dropdown>
+
+        <!-- Floating Notifications Rendered globally but inside Systray component context -->
+        <div t-attf-class="o_advanced_alarms_notifications_container position-#{state.direction}">
+            <!-- Local Time Floating Clock -->
+            <t t-if="state.isLocalClockPinned">
+                <div class="o_advanced_alarms_notification floating-clock-card" style="pointer-events: auto; min-width: 220px; text-align: center;">
+                    <div class="notif-header w-100 d-flex justify-content-between align-items-center border-bottom pb-1 mb-1" style="font-size: 0.75rem;">
+                        <span class="fw-bold text-primary"><i class="fa fa-clock-o me-1"></i>Local Time</span>
+                        <div class="d-flex align-items-center gap-1">
+                            <button class="btn-close-notif border-0 bg-transparent text-muted" t-on-click="() => this.toggleFloatingClock('local')" style="font-size: 1.1rem; line-height: 1;">×</button>
+                        </div>
+                    </div>
+                    <div class="notif-body text-center py-2">
+                        <div class="floating-clock-time fw-bold text-primary font-monospace fs-2" t-esc="state.floatingClockTime"/>
+                        <div class="floating-clock-date text-muted d-flex justify-content-center align-items-center gap-2" style="font-size: 0.65rem;" t-esc="state.floatingClockDate"/>
+                    </div>
+                </div>
+            </t>
+
+            <!-- Active Timezone Clocks (rendered at bottom of column-reverse stack) -->
+            <t t-foreach="state.worldClocks" t-as="clock" t-key="clock.id">
+                <div t-if="clock.is_pinned" class="o_advanced_alarms_notification floating-clock-card" style="pointer-events: auto; min-width: 220px; text-align: center;">
+                    <div class="notif-header w-100 d-flex justify-content-between align-items-center border-bottom pb-1 mb-1" style="font-size: 0.75rem;">
+                        <span class="fw-bold text-primary"><i class="fa fa-clock-o me-1"></i><t t-esc="clock.name"/></span>
+                        <div class="d-flex align-items-center gap-1">
+                            <button class="btn btn-sm btn-link p-0 text-muted" title="DST Setting" t-on-click="() => this.cycleDst(clock)">
+                                <i class="fa fa-cog"></i>
+                            </button>
+                            <button class="btn-close-notif border-0 bg-transparent text-muted" t-on-click="() => this.toggleFloatingClock(clock.id)" style="font-size: 1.1rem; line-height: 1;">×</button>
+                        </div>
+                    </div>
+                    <div class="notif-body text-center py-2">
+                        <div class="floating-clock-time fw-bold text-primary font-monospace fs-4">
+                            <t t-esc="getCityTime(clock.tz, clock.dstOffset)"/>
+                        </div>
+                        <div class="floating-clock-date text-muted d-flex justify-content-center align-items-center gap-2" style="font-size: 0.65rem;">
+                            <t t-esc="getCityDate(clock.tz, clock.dstOffset)"/>
+                            <span t-if="clock.dstOffset" class="badge rounded-pill bg-warning text-dark" style="font-size: 0.55rem;">
+                                <t t-if="clock.dstOffset &gt; 0">+1h</t>
+                                <t t-else="">-1h</t>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </t>
+
+            <!-- Normal Alerts/Notifications -->
+            <t t-foreach="state.notifications" t-as="notif" t-key="notif.id">
+                <div t-attf-class="o_advanced_alarms_notification #{notif.type} #{notif.is_critical ? 'critical' : ''} #{notif.is_ringing ? 'is-ringing' : ''}">
+                    <div class="notif-header">
+                        <div class="notif-title-group">
+                            <i t-attf-class="fa #{notif.type === 'alarm' ? 'fa-bell' : (notif.type === 'timer' ? 'fa-hourglass-end' : 'fa-clock-o')}"></i>
+                            <span t-esc="notif.title"/>
+                        </div>
+                        <button class="btn-close-notif" t-on-click="() => this.closeNotification(notif.id)">×</button>
+                    </div>
+                    <div class="notif-body">
+                        <t t-if="notif.type === 'scramble_alert'">
+                            <div class="text-center">
+                                <div class="mb-1 text-muted" t-esc="notif.message"/>
+                                <div class="scramble-capsule font-monospace fw-bold" style="font-size: 2.5rem; color: #ff3b30; text-shadow: 0 0 10px rgba(255,59,48,0.5);">
+                                    <t t-esc="notif.time_text"/>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <span t-esc="notif.message"/>
+                        </t>
+                    </div>
+                    <div class="notif-footer" t-if="notif.type !== 'scramble_alert'">
+                        <t t-if="notif.res_model &amp;&amp; notif.res_id">
+                            <span class="link-record" t-on-click="() => this.openLinkedRecord(notif.res_model, notif.res_id)">
+                                View Record
+                            </span>
+                        </t>
+                        <span class="notif-timer" t-esc="notif.time_text || ''"/>
+                    </div>
+                    
+                    <!-- Snooze / Dismiss actions inside Notification card -->
+                    <div class="notif-actions d-flex gap-2 justify-content-end mt-2" t-if="notif.type === 'alarm'">
+                        <button class="btn btn-secondary btn-sm btn-snooze py-1 px-2 fw-semibold" style="font-size: 0.75rem;" t-on-click="() => this.snoozeNotificationAlarm(notif)">
+                            <i class="fa fa-clock-o me-1"></i>Snooze
+                        </button>
+                        <button class="btn btn-primary btn-sm btn-dismiss py-1 px-2 fw-semibold" style="font-size: 0.75rem;" t-on-click="() => this.closeNotification(notif.id)">
+                            <i class="fa fa-check me-1"></i>Dismiss
+                        </button>
+                    </div>
+
+                    <!-- Auto expire bar for pre-alarms or timer done alerts if they are configured to disappear -->
+                    <div t-if="notif.expires" class="notif-progress-bar" t-attf-style="animation-duration: #{notif.expire_duration || 5}s;"/>
+                </div>
+            </t>
+        </div>
+    </t>
+
+    <!-- Custom Time Picker Widget Template -->
+    <t t-name="advanced_alarms.TimePickerField" owl="1">
+        <div class="o_field_time_picker_only d-flex align-items-center">
+            <t t-if="props.readonly">
+                <span class="o_field_widget" t-esc="formattedTime"/>
+            </t>
+            <t t-else="">
+                <div class="o_time_picker_input_container position-relative flex-grow-1">
+                    <DateTimeInput t-props="datePickerProps"/>
+                    <i class="fa fa-clock-o o_time_picker_icon position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #666;"/>
+                </div>
+            </t>
+        </div>
+    </t>
+
+    <!-- Inherit DateTimePicker to add class when showCalendar is false -->
+    <t t-inherit="web.DateTimePicker" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('o_datetime_picker')]" position="attributes">
+            <attribute name="t-att-class">!props.showCalendar ? 'o_datetime_picker_time_only' : ''</attribute>
+        </xpath>
+    </t>
+
+    <!-- Custom Weekday Selector Widget Template -->
+    <t t-name="advanced_alarms.WeekdaySelectorField">
+        <div class="o_weekday_selector d-flex gap-2 py-2">
+            <t t-foreach="days" t-as="day" t-key="day.key">
+                <button type="button"
+                    t-att-class="{'btn-day rounded-circle border d-flex align-items-center justify-content-center fw-bold': true, 'active bg-primary text-white': day.active, 'bg-white text-dark': !day.active}"
+                    t-on-click="() => this.toggleDay(day.key)"
+                    t-att-disabled="props.readonly"
+                    style="width: 32px; height: 32px; font-size: 0.8rem;"
+                    t-esc="day.label"
+                />
+            </t>
+        </div>
+    </t>
+</templates>
+

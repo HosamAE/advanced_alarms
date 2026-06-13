@@ -1,0 +1,228 @@
+<div>
+
+<section style="background:linear-gradient(135deg,#0D1B2A 0%,#1A2B45 100%);color:#fff;padding:40px;border-radius:12px;text-align:center;margin-bottom:24px;">
+  <img src="icon.svg" alt="Advanced Alarms Icon" style="width:100px;height:100px;border-radius:16px;margin-bottom:16px;box-shadow:0 0 30px rgba(0,212,255,0.4);background:#ffffff;"/>
+  <h1 style="font-size:2.2em;margin:0 0 8px;font-family:sans-serif;">Advanced Alarms &amp; Time Management</h1>
+  <p style="font-size:1.1em;color:#00D4FF;margin:0 0 16px;">Smart Alarms · Timers · Stopwatches · World Clocks — for Odoo 17</p>
+  <div style="display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center;">
+    <span style="background:rgba(0,212,255,0.15);border:1px solid #00D4FF;border-radius:20px;padding:4px 16px;font-size:0.85em;">Odoo 17</span>
+    <span style="background:rgba(123,47,255,0.15);border:1px solid #7B2FFF;border-radius:20px;padding:4px 16px;font-size:0.85em;">Productivity</span>
+    <span style="background:rgba(0,255,179,0.15);border:1px solid #00FFB3;border-radius:20px;padding:4px 16px;font-size:0.85em;">Time Management</span>
+    <span style="background:rgba(255,71,87,0.15);border:1px solid #FF4757;border-radius:20px;padding:4px 16px;font-size:0.85em;">RTL / LTR</span>
+  </div>
+</section>
+
+<img src="banner.png" alt="Advanced Alarms Banner" style="width:100%;border-radius:12px;margin-bottom:24px;box-shadow:0 8px 32px rgba(0,0,0,0.3)"/>
+
+<!-- OVERVIEW -->
+<section style="margin-bottom:32px;">
+  <h2 style="color:#0D1B2A;border-bottom:3px solid #00D4FF;padding-bottom:8px;">📋 Overview</h2>
+  <p style="font-size:1.05em;line-height:1.7;color:#333;">
+    <strong>Advanced Alarms &amp; Time Management</strong> is a self-contained Odoo 17 productivity module that brings
+    a professional time management system directly into your Odoo interface — no external tools, no integrations needed.
+    From critical alarms to multi-lap stopwatches, everything lives in a beautifully integrated systray widget with
+    real-time browser notifications and intelligent sound management.
+  </p>
+</section>
+
+<!-- FEATURES -->
+<section style="margin-bottom:32px;">
+  <h2 style="color:#0D1B2A;border-bottom:3px solid #7B2FFF;padding-bottom:8px;">⚡ Key Features</h2>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:16px;">
+
+    <div style="border:1px solid #e0e0e0;border-radius:10px;padding:20px;border-left:4px solid #FF4757;">
+      <h3 style="margin:0 0 8px;color:#FF4757;">🔔 Smart Alarms</h3>
+      <p style="margin:0;color:#555;font-size:0.95em;">One-time or recurring alarms with <strong>Critical</strong>, <strong>High</strong>, <strong>Normal</strong>, and <strong>Low</strong> priority levels. Critical alarms take visual and audio precedence. Past alarms shown muted, upcoming shown with vibrant colours per type.</p>
+    </div>
+
+    <div style="border:1px solid #e0e0e0;border-radius:10px;padding:20px;border-left:4px solid #00D4FF;">
+      <h3 style="margin:0 0 8px;color:#00D4FF;">⏱ Countdown Timers</h3>
+      <p style="margin:0;color:#555;font-size:0.95em;">Beautiful HH:MM:SS picker widget for duration input. Multiple timers can run simultaneously. Auto-dismiss after completion with configurable retention period.</p>
+    </div>
+
+    <div style="border:1px solid #e0e0e0;border-radius:10px;padding:20px;border-left:4px solid #00FFB3;">
+      <h3 style="margin:0 0 8px;color:#00AA80;">⏲ Multi-lap Stopwatches</h3>
+      <p style="margin:0;color:#555;font-size:0.95em;">Run multiple stopwatches with full lap tracking. Stopwatches remain visible in systray until manually dismissed. Precision to milliseconds.</p>
+    </div>
+
+    <div style="border:1px solid #e0e0e0;border-radius:10px;padding:20px;border-left:4px solid #FFA502;">
+      <h3 style="margin:0 0 8px;color:#FFA502;">🌐 World Clocks</h3>
+      <p style="margin:0;color:#555;font-size:0.95em;">Pre-configured world clocks for major time zones (New York, London, Dubai, Tokyo…). Displayed live in the systray dropdown with automatic DST handling.</p>
+    </div>
+
+    <div style="border:1px solid #e0e0e0;border-radius:10px;padding:20px;border-left:4px solid #7B2FFF;">
+      <h3 style="margin:0 0 8px;color:#7B2FFF;">🔊 Custom Sounds</h3>
+      <p style="margin:0;color:#555;font-size:0.95em;">5 built-in non-musical notification sounds. Upload your own custom MP3/OGG per alarm or timer. Full memory-leak-safe audio management with <code>willUnmount</code> cleanup.</p>
+    </div>
+
+    <div style="border:1px solid #e0e0e0;border-radius:10px;padding:20px;border-left:4px solid #2ED573;">
+      <h3 style="margin:0 0 8px;color:#2ED573;">🛡 Role-Based Security</h3>
+      <p style="margin:0;color:#555;font-size:0.95em;">Granular access control with dedicated groups: Alarm Manager, Timer User, Stopwatch User, and World Clock Viewer. Record rules ensure users only see their own records.</p>
+    </div>
+
+    <div style="border:1px solid #e0e0e0;border-radius:10px;padding:20px;border-left:4px solid #FF6B81;">
+      <h3 style="margin:0 0 8px;color:#FF6B81;">📱 Mobile Responsive</h3>
+      <p style="margin:0;color:#555;font-size:0.95em;">Media-query-optimised SCSS for screens below 768px. Floating notifications resize and reposition, stopwatch widget moves to bottom to avoid covering Odoo navigation bars.</p>
+    </div>
+
+    <div style="border:1px solid #e0e0e0;border-radius:10px;padding:20px;border-left:4px solid #1E90FF;">
+      <h3 style="margin:0 0 8px;color:#1E90FF;">🌗 RTL / LTR Support</h3>
+      <p style="margin:0;color:#555;font-size:0.95em;">Full bidirectional text support. Stacked notifications correctly anchor to right for RTL (Arabic) and left for LTR (English) without any additional configuration.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- SCREENSHOTS -->
+<section style="margin-bottom:32px;">
+  <h2 style="color:#0D1B2A;border-bottom:3px solid #FF6B81;padding-bottom:8px;">📸 Screenshots Showcase</h2>
+  <p style="color:#555;font-size:1.05em;margin-bottom:20px;">Beautifully designed for both <strong>Light Mode</strong> and <strong>Dark Mode</strong> natively in Odoo 17.</p>
+  
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;">
+    <!-- Dark Mode Screenshots -->
+    <div style="text-align:center;">
+      <h4 style="color:#444;margin-bottom:8px;">Alarms List (Dark Mode)</h4>
+      <img src="dark_alarms_list.png" alt="Dark Alarms List" style="width:100%;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.1);border:1px solid #ddd;"/>
+    </div>
+    <div style="text-align:center;">
+      <h4 style="color:#444;margin-bottom:8px;">Ringing Notification (Dark Mode)</h4>
+      <img src="dark_notification.png" alt="Dark Notification" style="width:100%;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.1);border:1px solid #ddd;"/>
+    </div>
+    <div style="text-align:center;">
+      <h4 style="color:#444;margin-bottom:8px;">Floating Local Time (Dark Mode)</h4>
+      <img src="dark_floating_clock.png" alt="Dark Floating Clock" style="width:100%;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.1);border:1px solid #ddd;"/>
+    </div>
+
+    <!-- Light Mode Screenshots -->
+    <div style="text-align:center;">
+      <h4 style="color:#444;margin-bottom:8px;">World Clock (Light Mode)</h4>
+      <img src="light_world_clock.png" alt="Light World Clock" style="width:100%;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.1);border:1px solid #ddd;"/>
+    </div>
+    <div style="text-align:center;">
+      <h4 style="color:#444;margin-bottom:8px;">Countdown Timers (Light Mode)</h4>
+      <img src="light_timers.png" alt="Light Timers" style="width:100%;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.1);border:1px solid #ddd;"/>
+    </div>
+    <div style="text-align:center;">
+      <h4 style="color:#444;margin-bottom:8px;">Stopwatches (Light Mode)</h4>
+      <img src="light_stopwatches.png" alt="Light Stopwatches" style="width:100%;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.1);border:1px solid #ddd;"/>
+    </div>
+    <div style="text-align:center;">
+      <h4 style="color:#444;margin-bottom:8px;">Ringing Notification (Light Mode)</h4>
+      <img src="light_notification.png" alt="Light Notification" style="width:100%;border-radius:8px;box-shadow:0 4px 15px rgba(0,0,0,0.1);border:1px solid #ddd;"/>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section style="margin-bottom:32px;">
+  <h2 style="color:#0D1B2A;border-bottom:3px solid #00FFB3;padding-bottom:8px;">🔧 How It Works</h2>
+  <ol style="font-size:1em;line-height:2;color:#444;padding-left:24px;">
+    <li>Install the module and grant the appropriate group to your users.</li>
+    <li>Access Alarms, Timers, and Stopwatches from the dedicated <strong>systray bell icon</strong> in the Odoo top bar.</li>
+    <li>Create alarms with priority, recurrence, assigned user, and optional custom sound.</li>
+    <li>Start timers with a simple duration picker — they countdown live in the systray.</li>
+    <li>Launch stopwatches; record laps with a single click — sessions persist across page refreshes.</li>
+    <li>The system automatically notifies users about overdue data cleanup to keep the database lean.</li>
+  </ol>
+</section>
+
+<!-- ARCHITECTURE -->
+<section style="margin-bottom:32px;">
+  <h2 style="color:#0D1B2A;border-bottom:3px solid #FFA502;padding-bottom:8px;">🏗 Technical Architecture</h2>
+  <table style="width:100%;border-collapse:collapse;font-size:0.95em;">
+    <thead>
+      <tr style="background:#0D1B2A;color:white;">
+        <th style="padding:12px 16px;text-align:left;">Layer</th>
+        <th style="padding:12px 16px;text-align:left;">Components</th>
+        <th style="padding:12px 16px;text-align:left;">Technology</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="background:#f9f9f9;">
+        <td style="padding:10px 16px;font-weight:bold;color:#00D4FF;">Backend Models</td>
+        <td style="padding:10px 16px;"><code>advanced.alarm</code>, <code>advanced.timer</code>, <code>advanced.stopwatch</code>, <code>advanced.world.clock</code>, <code>advanced.alarm.sound</code></td>
+        <td style="padding:10px 16px;">Python / ORM</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 16px;font-weight:bold;color:#7B2FFF;">Frontend</td>
+        <td style="padding:10px 16px;">Systray Dropdown, Notification Manager, Time Picker, Weekday Selector, Stopwatch Widget, Alarm Preview</td>
+        <td style="padding:10px 16px;">OWL 2 / JavaScript</td>
+      </tr>
+      <tr style="background:#f9f9f9;">
+        <td style="padding:10px 16px;font-weight:bold;color:#00FFB3;">Realtime</td>
+        <td style="padding:10px 16px;">Live countdowns, bus-based notifications, alarm polling</td>
+        <td style="padding:10px 16px;">Odoo Bus / WebSocket</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 16px;font-weight:bold;color:#FFA502;">Styling</td>
+        <td style="padding:10px 16px;">Glassmorphism panels, animated notifications, vibration effects, dark/light compatible</td>
+        <td style="padding:10px 16px;">SCSS</td>
+      </tr>
+      <tr style="background:#f9f9f9;">
+        <td style="padding:10px 16px;font-weight:bold;color:#FF4757;">Security</td>
+        <td style="padding:10px 16px;">Groups, record rules, CSV ACL per model</td>
+        <td style="padding:10px 16px;">Odoo Security XML</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- CONFIGURATION -->
+<section style="margin-bottom:32px;">
+  <h2 style="color:#0D1B2A;border-bottom:3px solid #FF4757;padding-bottom:8px;">⚙️ Configuration</h2>
+  <p style="color:#444;">Navigate to <strong>Settings → Technical → Advanced Alarms</strong> to configure:</p>
+  <ul style="color:#444;line-height:2;">
+    <li>Default data retention period for completed alarms/timers</li>
+    <li>Cleanup reminder threshold (days before warning is sent)</li>
+    <li>Default sound preferences per user</li>
+    <li>Per-user override of notification preferences</li>
+  </ul>
+</section>
+
+<!-- CHANGELOG -->
+<section style="margin-bottom:32px;">
+  <h2 style="color:#0D1B2A;border-bottom:3px solid #2ED573;padding-bottom:8px;">📝 Changelog</h2>
+  <div style="border-left:3px solid #2ED573;padding-left:16px;">
+    <h4 style="margin:0 0 4px;">v17.0.1.0.0 — Initial Release (June 2026)</h4>
+    <ul style="color:#555;margin:4px 0 0;line-height:1.8;">
+      <li>Full alarm system with priority levels and recurrence</li>
+      <li>Countdown timers with HH:MM:SS widget</li>
+      <li>Multi-lap stopwatches</li>
+      <li>World clock integration</li>
+      <li>Custom sound uploads</li>
+      <li>Role-based security groups</li>
+      <li>Mobile responsive design</li>
+      <li>Memory-leak-safe OWL components</li>
+      <li>Full RTL/LTR support</li>
+    </ul>
+  </div>
+</section>
+
+<!-- AUTHOR -->
+<section style="background:linear-gradient(135deg,#0D1B2A,#1A2B45);color:#fff;padding:32px;border-radius:12px;text-align:center;margin-bottom:24px;">
+  <h2 style="color:#00D4FF;margin:0 0 8px;">👨‍💻 Author</h2>
+  <p style="font-size:1.3em;font-weight:bold;margin:0 0 4px;">HosamAE — Hossam A. Eissa</p>
+  <p style="color:#aaa;margin:0 0 16px;">Odoo Developer &amp; Software Engineer</p>
+  <div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;">
+    <a href="mailto:HossamA.Eissa@gmail.com" style="color:#00D4FF;text-decoration:none;">✉ HossamA.Eissa@gmail.com</a>
+    <a href="https://www.linkedin.com/in/hossameldeen-eissa/" target="_blank" style="color:#7B2FFF;text-decoration:none;">🔗 LinkedIn Profile</a>
+  </div>
+</section>
+
+<!-- LICENSE -->
+<section style="background:#FFF8E1;border:1px solid #FFA502;border-radius:10px;padding:24px;margin-bottom:24px;">
+  <h2 style="color:#B76E00;margin:0 0 12px;">⚖️ License &amp; Usage Terms</h2>
+  <p style="color:#555;line-height:1.8;margin:0;">
+    This module is released under a <strong>Custom Attribution License</strong>.<br/>
+    ✅ <strong>Free to use</strong> in commercial and personal Odoo projects.<br/>
+    ✅ <strong>Free to modify</strong> the source code for internal use.<br/>
+    ❌ <strong>NOT allowed</strong> to re-publish or list under a different author name.<br/>
+    ❌ <strong>NOT allowed</strong> to remove or alter copyright notices.<br/>
+    ❌ <strong>NOT allowed</strong> to claim ownership of original or derived work.<br/><br/>
+    Any derived work distributed externally must include: <em>"Based on Advanced Alarms &amp; Time Management — Original Author: HosamAE"</em>.
+    See the <strong>LICENSE</strong> file for complete terms.
+  </p>
+</section>
+
+</div>

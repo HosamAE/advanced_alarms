@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Advanced Alarms & Time Management — Odoo 17
+    Copyright (c) 2024-2026 HosamAE (Hossam A. Eissa)
+    Email   : HossamA.Eissa@gmail.com
+    LinkedIn: https://www.linkedin.com/in/hossameldeen-eissa/
+
+    Licensed under the Custom Attribution License — see LICENSE file.
+    Free to use and modify; NOT allowed to re-publish under a different author name.
+-->
+<templates xml:space="preserve">
+    <t t-name="advanced_alarms.AlarmPreviewField" owl="1">
+        <div class="o_alarm_preview_container d-flex flex-wrap gap-2 mt-3 mb-3">
+            <t t-foreach="previewDays" t-as="day" t-key="day.index">
+                <div t-attf-class="o_alarm_preview_card d-flex flex-column align-items-center justify-content-center p-2 rounded {{ day.isActive ? 'active' : 'inactive' }}">
+                    <span class="day-label text-muted mb-1"><t t-esc="day.label"/></span>
+                    <t t-if="day.isActive">
+                        <span class="time-label font-weight-bold" style="font-size: 1.2rem; color: #4facfe;"><t t-esc="day.time"/></span>
+                    </t>
+                    <t t-else="">
+                        <span class="time-label font-weight-bold text-muted" style="font-size: 1.2rem;">Off</span>
+                    </t>
+                    <span class="date-label text-muted mt-1" style="font-size: 0.8rem;"><t t-esc="day.dateStr"/></span>
+                </div>
+            </t>
+        </div>
+    </t>
+</templates>

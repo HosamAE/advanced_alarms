@@ -1,0 +1,858 @@
+/**
+ * Advanced Alarms & Time Management — Odoo 17
+ * Copyright (c) 2024-2026 HosamAE (Hossam A. Eissa)
+ * Email   : HossamA.Eissa@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/hossameldeen-eissa/
+ *
+ * Licensed under the Custom Attribution License — see LICENSE file.
+ */
+/* SCSS for Advanced Alarms & Time Management */
+
+/* Systray Icon & Badge */
+.o_advanced_alarms_systray {
+    position: relative;
+    cursor: pointer;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+
+    i {
+        font-size: 1.2rem;
+        color: #666;
+        transition: color 0.3s ease;
+    }
+
+    &:hover i {
+        color: #000;
+    }
+
+    .badge {
+        position: absolute;
+        top: 5px;
+        right: 2px;
+        background-color: #dc3545;
+        color: white;
+        font-size: 0.65rem;
+        padding: 3px 6px;
+        border-radius: 10px;
+        font-weight: bold;
+    }
+
+    &.ringing i {
+        animation: ring 0.5s ease infinite;
+        color: #dc3545 !important;
+    }
+}
+
+/* Keyframes for Ringing Animation */
+@keyframes ring {
+    0% { transform: rotate(0); }
+    10% { transform: rotate(15deg); }
+    20% { transform: rotate(-10deg); }
+    30% { transform: rotate(10deg); }
+    40% { transform: rotate(-8deg); }
+    50% { transform: rotate(6deg); }
+    60% { transform: rotate(-4deg); }
+    70% { transform: rotate(3deg); }
+    80% { transform: rotate(-2deg); }
+    90% { transform: rotate(1deg); }
+    100% { transform: rotate(0); }
+}
+
+/* Dropdown Container */
+.o_advanced_alarms_dropdown {
+    width: 380px;
+    max-height: 480px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 6px !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid #e2e8f0 !important;
+    overflow: hidden;
+    padding: 0 !important;
+    background: #ffffff;
+
+    .dropdown-header-custom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #ffffff;
+        padding: 8px 16px;
+        border-bottom: 1px solid #e2e8f0;
+        min-height: 44px;
+
+        .tabs-header {
+            display: flex;
+            gap: 32px;
+            justify-content: center;
+
+            .tab-btn {
+                padding: 10px 15px;
+                border: none;
+                background: none;
+                font-weight: 500;
+                color: #64748b;
+                cursor: pointer;
+                border-bottom: 2px solid transparent;
+                transition: all 0.15s ease;
+                font-size: 0.85rem;
+
+                &.active {
+                    color: #017e84; /* Standard Odoo Teal */
+                    border-bottom-color: #017e84;
+                    font-weight: 600;
+                }
+
+                &:hover:not(.active) {
+                    color: #1e293b;
+                }
+            }
+        }
+
+        .btn-add-alarm {
+            background: none;
+            border: none;
+            color: #017e84;
+            padding: 6px 0;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.15s ease;
+
+            &:hover {
+                color: #015f63;
+                text-decoration: underline;
+            }
+        }
+    }
+
+    /* Tab Content */
+    .tab-content-area {
+        flex-grow: 1;
+        overflow-y: auto;
+        max-height: 380px;
+        padding: 12px;
+        background: #f8fafc;
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
+            color: #94a3b8;
+            font-size: 0.85rem;
+
+            i {
+                font-size: 2rem;
+                margin-bottom: 8px;
+                opacity: 0.6;
+            }
+        }
+    }
+}
+
+/* Timeline/List Items */
+.alarm-item-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    &.critical {
+        border-left: 4px solid #dc3545;
+    }
+
+    &.muted-state {
+        opacity: 0.5;
+        background: #f3f4f6;
+        border-color: #d1d5db;
+        box-shadow: none;
+        .item-title {
+            text-decoration: line-through;
+            color: #9ca3af;
+        }
+        &:hover {
+            transform: none;
+            box-shadow: none;
+        }
+    }
+
+    &.type-once {
+        border-left: 4px solid #3b82f6; /* Blue */
+        background: linear-gradient(to right, rgba(59, 130, 246, 0.05), #ffffff);
+    }
+    &.type-cycle {
+        border-left: 4px solid #10b981; /* Green */
+        background: linear-gradient(to right, rgba(16, 185, 129, 0.05), #ffffff);
+    }
+    &.type-scrum {
+        border-left: 4px solid #f59e0b; /* Orange */
+        background: linear-gradient(to right, rgba(245, 158, 11, 0.05), #ffffff);
+    }
+    &.type-custom {
+        border-left: 4px solid #8b5cf6; /* Purple */
+        background: linear-gradient(to right, rgba(139, 92, 246, 0.05), #ffffff);
+    }
+    &.type-shifts {
+        border-left: 4px solid #06b6d4; /* Cyan */
+        background: linear-gradient(to right, rgba(6, 182, 212, 0.05), #ffffff);
+    }
+
+    .item-info {
+        flex-grow: 1;
+        overflow: hidden;
+        margin-right: 10px;
+
+        .item-title {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .item-time {
+            font-size: 0.75rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+    }
+
+    .item-actions {
+        display: flex;
+        gap: 6px;
+
+        button {
+            border: none;
+            background: none;
+            color: #9ca3af;
+            padding: 4px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+
+            &:hover {
+                background: #f3f4f6;
+                color: #1f2937;
+            }
+
+            &.btn-delete:hover {
+                color: #dc3545;
+                background: #fef2f2;
+            }
+        }
+    }
+}
+
+/* Timer / Stopwatch Cards */
+.timer-item-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .timer-header {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #1f2937;
+    }
+
+    .timer-display {
+        font-size: 1.5rem;
+        font-family: monospace;
+        text-align: center;
+        color: #2563eb;
+        font-weight: bold;
+    }
+
+    .timer-controls {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+
+        button {
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid #d1d5db;
+            background: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover {
+                background: #f3f4f6;
+            }
+
+            &.btn-primary-action {
+                background: #2563eb;
+                color: white;
+                border-color: #2563eb;
+
+                &:hover {
+                    background: #1d4ed8;
+                }
+            }
+        }
+    }
+}
+
+/* Floating Notification Container */
+.o_advanced_alarms_notifications_container {
+    position: fixed;
+    z-index: 900; /* Lower than dropdown (1000) to prevent covering it */
+    display: flex;
+    gap: 12px;
+    width: 360px;
+    max-height: calc(100vh - 120px); /* Leave space for navbar and bottom edge */
+    overflow-y: auto;
+    pointer-events: none; /* Let clicks pass through container background */
+    padding: 20px; /* Add padding so scrollbar and shadows are not cut off */
+
+    
+    /* Subtle Scrollbar */
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+        background: transparent; 
+    }
+    &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2); 
+        border-radius: 10px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3); 
+    }
+
+
+    &.position-bottom-right {
+        bottom: 20px;
+        right: 20px;
+        flex-direction: column-reverse;
+    }
+
+    &.position-bottom-left {
+        bottom: 20px;
+        left: 20px;
+        flex-direction: column-reverse;
+    }
+
+    &.position-top-right {
+        top: 60px;
+        right: 20px;
+        flex-direction: column;
+    }
+
+    &.position-top-left {
+        top: 60px;
+        left: 20px;
+        flex-direction: column;
+    }
+}
+
+/* Notification Card styling with glassmorphism */
+.o_advanced_alarms_notification {
+    pointer-events: auto; /* Enable clicks on the notification itself */
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    
+    /* Ensure they don't shrink and support smooth expansion */
+    flex-shrink: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+
+    /* Conditionally compress starting from 2nd item if total > 4 */
+    &:first-child:nth-last-child(n+5) ~ &:not(.is-ringing) {
+        max-height: 52px; /* Just enough to show the header */
+        opacity: 0.85;
+        transform: scale(0.95);
+        
+        &:hover {
+            max-height: 300px; /* Expand fully */
+            opacity: 1;
+            transform: scale(1);
+            z-index: 10;
+        }
+    }
+
+    /* Ringing Alarm Styles */
+    &.is-ringing {
+        border-color: rgba(220, 53, 69, 0.6); /* Red border */
+        box-shadow: 0 0 20px rgba(220, 53, 69, 0.3);
+        transform: scale(1.02);
+        animation: pulseRinging 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 20; /* Keep it on top */
+        
+        .notif-header .fa {
+            color: #dc3545; /* Bootstrap danger red */
+            animation: ringShake 0.5s infinite ease-in-out alternate;
+        }
+    }
+
+    .notif-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .notif-title-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            color: #1f2937;
+            font-size: 0.95rem;
+
+            i {
+                font-size: 1.1rem;
+                color: #2563eb;
+            }
+        }
+
+        .btn-close-notif {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 0.95rem;
+            padding: 2px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            transition: background 0.2s;
+
+            &:hover {
+                background: rgba(0, 0, 0, 0.05);
+                color: #1f2937;
+            }
+        }
+    }
+
+    .notif-body {
+        font-size: 0.85rem;
+        color: #4b5563;
+        line-height: 1.4;
+    }
+
+    .notif-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 4px;
+
+        .link-record {
+            font-size: 0.8rem;
+            color: #2563eb;
+            text-decoration: underline;
+            cursor: pointer;
+
+            &:hover {
+                color: #1d4ed8;
+            }
+        }
+
+        .notif-timer {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+    }
+
+    /* Progress bar for auto-expiring notifications */
+    .notif-progress-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        background: #2563eb;
+        width: 100%;
+        transform-origin: left;
+        animation: progressContract 5s linear forwards;
+    }
+
+    /* Critical style */
+    &.critical {
+        background: rgba(254, 242, 242, 0.9);
+        border: 2px solid #ef4444;
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+        animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards, pulseCritical 2s infinite;
+
+        .notif-header .notif-title-group i {
+            color: #ef4444;
+            animation: ring 0.5s ease infinite;
+        }
+
+        .notif-header .notif-title-group {
+            color: #991b1b;
+        }
+
+        .notif-body {
+            color: #7f1d1d;
+            font-weight: 500;
+        }
+    }
+
+    /* Pre-alarm style */
+    &.pre-alarm {
+        border-left: 4px solid #f59e0b;
+        
+        .notif-header .notif-title-group i {
+            color: #f59e0b;
+        }
+    }
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes progressContract {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+}
+
+@keyframes pulseCritical {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+/* Floating Glassmorphic Clock */
+.o_advanced_alarms_floating_clock {
+    position: fixed;
+    z-index: 1040;
+    width: 170px;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    user-select: none;
+    transition: box-shadow 0.2s;
+
+    &:hover {
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+    }
+
+    .floating-clock-header {
+        color: #64748b;
+        font-family: inherit;
+    }
+
+    .floating-clock-time {
+        font-family: monospace;
+        letter-spacing: 0.5px;
+    }
+}
+
+
+/* Settings tab style */
+.settings-tab {
+    max-height: 350px;
+    overflow-y: auto;
+    
+    .form-label {
+        margin-bottom: 4px;
+    }
+    .form-select, .form-control {
+        border-color: #cbd5e1;
+        &:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 1px #3b82f6;
+        }
+    }
+}
+
+/* World Clock */
+.world-clock-main {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.city-time-card {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    transition: transform 0.2s;
+    &:hover {
+        transform: translateY(-1px);
+    }
+}
+
+/* Time Picker Only styles */
+.o_field_time_picker_only {
+    width: 100%;
+    .o_datetime_input {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        input {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 0.375rem 0.75rem;
+            width: 100%;
+            height: 35px;
+            &:focus {
+                border-color: #017e84 !important;
+                box-shadow: none !important;
+                outline: none !important;
+            }
+        }
+    }
+}
+
+.o_datetime_picker.o_datetime_picker_time_only {
+    border: 1px solid #dee2e6;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    background: white;
+    padding: 10px !important;
+    min-width: auto !important;
+
+    .o_datetime_picker_header {
+        display: none !important;
+    }
+
+    .o_date_picker, .o_date_item_picker {
+        display: none !important;
+    }
+
+    .o_time_picker {
+        border-top: none !important;
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+        gap: 5px !important;
+        
+        select.o_time_picker_select {
+            border: 1px solid #eee;
+            border-radius: 6px;
+            background-color: #f8f9fa;
+            font-weight: 500;
+            padding: 5px;
+            cursor: pointer;
+            
+            &:hover {
+                background-color: #fff;
+                border-color: #017e84;
+            }
+        }
+    }
+
+    .o_datetime_buttons {
+        position: static !important;
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+        padding-top: 10px;
+        border-top: 1px solid #f0f0f0;
+        
+        .btn {
+            border-radius: 20px;
+            padding: 5px 20px;
+            text-transform: uppercase;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background-color: #017e84;
+            border-color: #017e84;
+            &:hover {
+                background-color: #015f63;
+            }
+        }
+    }
+}
+
+[data-bs-theme="dark"] .o_datetime_picker.o_datetime_picker_time_only {
+    background-color: #1a1c1e;
+    border-color: #333;
+    
+    .o_time_picker select.o_time_picker_select {
+        background-color: #2a2d31;
+        border-color: #444;
+        color: #eee;
+    }
+    
+    .o_datetime_buttons {
+        border-top-color: #333;
+    }
+}
+
+
+
+@keyframes pulseRinging {
+    0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); transform: scale(1.02); }
+    50% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); transform: scale(1.03); }
+    100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); transform: scale(1.02); }
+}
+
+@keyframes ringShake {
+    0% { transform: rotate(-15deg); }
+    100% { transform: rotate(15deg); }
+}
+
+/* Adjust negative margins to squeeze compressed items closer */
+.o_advanced_alarms_notifications_container.position-top-right .o_advanced_alarms_notification:first-child:nth-last-child(n+5) ~ .o_advanced_alarms_notification:not(.is-ringing),
+.o_advanced_alarms_notifications_container.position-top-left .o_advanced_alarms_notification:first-child:nth-last-child(n+5) ~ .o_advanced_alarms_notification:not(.is-ringing) {
+    margin-top: -32px;
+    &:hover { margin-top: 0; }
+}
+
+.o_advanced_alarms_notifications_container.position-bottom-right .o_advanced_alarms_notification:first-child:nth-last-child(n+5) ~ .o_advanced_alarms_notification:not(.is-ringing),
+.o_advanced_alarms_notifications_container.position-bottom-left .o_advanced_alarms_notification:first-child:nth-last-child(n+5) ~ .o_advanced_alarms_notification:not(.is-ringing) {
+    margin-bottom: -32px;
+    &:hover { margin-bottom: 0; }
+}
+
+/* Fix z-index stacking so bottom cards appear on top of compressed cards above them */
+.o_advanced_alarms_notifications_container {
+    .o_advanced_alarms_notification:nth-child(1) { z-index: 50; }
+    .o_advanced_alarms_notification:nth-child(2) { z-index: 49; }
+    .o_advanced_alarms_notification:nth-child(3) { z-index: 48; }
+    .o_advanced_alarms_notification:nth-child(4) { z-index: 47; }
+    .o_advanced_alarms_notification:nth-child(5) { z-index: 46; }
+    .o_advanced_alarms_notification:nth-child(6) { z-index: 45; }
+    .o_advanced_alarms_notification:nth-child(7) { z-index: 44; }
+    .o_advanced_alarms_notification:nth-child(8) { z-index: 43; }
+    .o_advanced_alarms_notification:nth-child(9) { z-index: 42; }
+    .o_advanced_alarms_notification:nth-child(10) { z-index: 41; }
+    .o_advanced_alarms_notification:nth-child(11) { z-index: 40; }
+    .o_advanced_alarms_notification:nth-child(12) { z-index: 39; }
+    .o_advanced_alarms_notification:nth-child(13) { z-index: 38; }
+    .o_advanced_alarms_notification:nth-child(14) { z-index: 37; }
+    .o_advanced_alarms_notification:nth-child(15) { z-index: 36; }
+    .o_advanced_alarms_notification:nth-child(n+16) { z-index: 1; }
+
+    /* Override hover to always be on top */
+    .o_advanced_alarms_notification:hover {
+        z-index: 100 !important;
+    }
+}
+
+/* Alarm Preview Cards */
+.o_alarm_preview_container {
+    background-color: transparent !important;
+}
+
+/* =========================================================================
+   Mobile Responsiveness
+   ========================================================================= */
+@media (max-width: 768px) {
+    /* Make floating notifications smaller and stick them to top so they don't block UI */
+    .o_advanced_alarms_notifications_container {
+        top: 60px !important;
+        right: 10px !important;
+        left: 10px !important;
+        bottom: auto !important;
+        width: auto !important;
+        z-index: 9999 !important;
+        pointer-events: none;
+    }
+
+    .o_advanced_alarms_notification {
+        width: 100% !important;
+        pointer-events: auto;
+        padding: 10px !important;
+        margin-bottom: 5px !important;
+    }
+
+    .o_advanced_alarms_notification .notif-body .notif-title {
+        font-size: 0.95rem;
+    }
+    .o_advanced_alarms_notification .notif-body .notif-time {
+        font-size: 0.8rem;
+    }
+
+    /* Floating Stopwatch positioning */
+    .o_advanced_stopwatch_floating {
+        bottom: 20px !important;
+        right: 20px !important;
+        left: auto !important;
+        top: auto !important;
+        transform: scale(0.8);
+        transform-origin: bottom right;
+    }
+    
+    /* Minimize the dropdown width on mobile */
+    .o_advanced_alarms_dropdown {
+        width: 320px;
+        max-height: 80vh;
+    }
+}
+
+.o_alarm_preview_card {
+    min-width: 90px;
+    background-color: #2c2c2e;
+    border: 1px solid #3a3a3c;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+.o_alarm_preview_card.active {
+    border-color: #4facfe;
+    background-color: #1c1c1e;
+    box-shadow: 0 0 10px rgba(79, 172, 254, 0.2);
+}
+.o_alarm_preview_card.inactive {
+    opacity: 0.6;
+}
+.o_alarm_preview_card .day-label {
+    font-size: 0.9rem;
+    color: #8e8e93;
+}
+.o_alarm_preview_card.active .day-label {
+    color: #4facfe;
+}
+.o_alarm_preview_card .time-label {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
