@@ -5,9 +5,9 @@
 
 ![Module Icon](static/description/icon.png)
 
-**A powerful, self-contained productivity module for Odoo 17**
+**A powerful, self-contained productivity module for Odoo 19**
 
-[![Odoo Version](https://img.shields.io/badge/Odoo-17.0-875A7B?style=flat-square&logo=odoo)](https://www.odoo.com)
+[![Odoo Version](https://img.shields.io/badge/Odoo-19.0-875A7B?style=flat-square&logo=odoo)](https://www.odoo.com)
 [![License](https://img.shields.io/badge/License-Custom_Attribution-orange?style=flat-square)](LICENSE)
 [![Author](https://img.shields.io/badge/Author-HosamAE-00D4FF?style=flat-square)](https://www.linkedin.com/in/hossameldeen-eissa/)
 [![Category](https://img.shields.io/badge/Category-Productivity-7B2FFF?style=flat-square)](#)
@@ -20,7 +20,7 @@
 
 ## 📋 Overview
 
-**Advanced Alarms & Time Management** brings a complete time management suite directly into Odoo's interface. Built from the ground up for Odoo 17 with OWL 2 components, it provides a rich systray experience with real-time notifications, customisable sounds, and intelligent data retention — all without any external dependencies.
+**Advanced Alarms & Time Management** brings a complete time management suite directly into Odoo's interface. Built from the ground up for Odoo 19 with OWL 2 components, it provides a rich systray experience with real-time notifications, customisable sounds, and intelligent data retention — all without any external dependencies.
 
 ---
 
@@ -167,7 +167,7 @@ tests/test_recurrence.py        # Recurrence logic edge cases
 
 ## 📝 Changelog
 
-### v17.0.1.0.0 — June 2026 (Initial Release)
+### v19.0.1.0.0 — June 2026 (Initial Release)
 - ✅ Full alarm system with 4 priority levels and recurrence rules
 - ✅ Countdown timers with HH:MM:SS widget
 - ✅ Multi-lap stopwatches with persistence
