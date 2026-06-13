@@ -10,7 +10,7 @@
  */
 
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
-import { Component } from "@odoo/owl";
+import { Component, useState, useExternalListener, useRef } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { DateTimeInput } from "@web/core/datetime/datetime_input";
 import { localization } from "@web/core/l10n/localization";
@@ -62,6 +62,31 @@ export class TimePickerField extends Component {
         super.setup(...arguments);
         this.hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
         this.minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
+        this.state = useState({
+            openDropdown: null,
+        });
+        this.rootRef = useRef("root");
+        useExternalListener(window, "click", this.onWindowClick);
+    }
+
+    onWindowClick(ev) {
+        if (this.rootRef.el && !this.rootRef.el.contains(ev.target)) {
+            this.state.openDropdown = null;
+        }
+    }
+
+    openDropdown(type) {
+        this.state.openDropdown = type;
+    }
+
+    selectHour(h) {
+        this.updateTime(h, this.currentMinute);
+        this.state.openDropdown = null;
+    }
+
+    selectMinute(m) {
+        this.updateTime(this.currentHour, m);
+        this.state.openDropdown = null;
     }
 
     get parsedDate() {

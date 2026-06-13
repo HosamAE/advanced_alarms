@@ -310,25 +310,29 @@
 
     <!-- Custom Time Picker Widget Template -->
     <t t-name="advanced_alarms.TimePickerField" owl="1">
-        <div class="o_field_time_picker_only d-flex align-items-center">
+        <div class="o_field_time_picker_only d-flex align-items-center" t-ref="root">
             <t t-if="props.readonly">
                 <span class="o_field_widget" t-esc="formattedTime"/>
             </t>
             <t t-else="">
                 <div class="d-flex align-items-center gap-1">
-                    <input type="text" class="o_input text-center" style="width: 3.5rem; padding: 2px;" list="hourList" t-att-value="currentHour" t-on-change="onHourChange"/>
-                    <datalist id="hourList">
-                        <t t-foreach="hours" t-as="h" t-key="h">
-                            <option t-att-value="h"><t t-esc="h"/></option>
-                        </t>
-                    </datalist>
+                    <div class="position-relative">
+                        <input type="text" class="o_input text-center" style="width: 3.5rem; padding: 2px;" t-att-value="currentHour" t-on-change="onHourChange" t-on-click="() => this.openDropdown('hour')"/>
+                        <div t-if="state.openDropdown === 'hour'" class="position-absolute bg-view border shadow-sm" style="top: 100%; left: 0; max-height: 150px; overflow-y: auto; width: 3.5rem; z-index: 1000;">
+                            <t t-foreach="hours" t-as="h" t-key="h">
+                                <div class="p-1 text-center cursor-pointer" t-on-click="() => this.selectHour(h)" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'"><t t-esc="h"/></div>
+                            </t>
+                        </div>
+                    </div>
                     <span class="fw-bold px-1">:</span>
-                    <input type="text" class="o_input text-center" style="width: 3.5rem; padding: 2px;" list="minuteList" t-att-value="currentMinute" t-on-change="onMinuteChange"/>
-                    <datalist id="minuteList">
-                        <t t-foreach="minutes" t-as="m" t-key="m">
-                            <option t-att-value="m"><t t-esc="m"/></option>
-                        </t>
-                    </datalist>
+                    <div class="position-relative">
+                        <input type="text" class="o_input text-center" style="width: 3.5rem; padding: 2px;" t-att-value="currentMinute" t-on-change="onMinuteChange" t-on-click="() => this.openDropdown('minute')"/>
+                        <div t-if="state.openDropdown === 'minute'" class="position-absolute bg-view border shadow-sm" style="top: 100%; left: 0; max-height: 150px; overflow-y: auto; width: 3.5rem; z-index: 1000;">
+                            <t t-foreach="minutes" t-as="m" t-key="m">
+                                <div class="p-1 text-center cursor-pointer" t-on-click="() => this.selectMinute(m)" onmouseover="this.style.backgroundColor='rgba(0,0,0,0.1)'" onmouseout="this.style.backgroundColor='transparent'"><t t-esc="m"/></div>
+                            </t>
+                        </div>
+                    </div>
                 </div>
             </t>
         </div>
