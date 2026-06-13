@@ -18,7 +18,7 @@
 
         <record id="group_alarm_manager" model="res.groups">
             <field name="name">Alarm Manager</field>
-            <field name="category_id" ref="module_category_advanced_alarms"/>
+
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
             <field name="comment">The user will be able to access the Alarms Application Menu and manage alarms.</field>
         </record>
