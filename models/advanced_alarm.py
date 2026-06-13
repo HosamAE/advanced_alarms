@@ -141,9 +141,10 @@ class AdvancedAlarm(models.Model):
     def write(self, vals):
         res = super(AdvancedAlarm, self).write(vals)
         fields_to_check = [
-            'state', 'alarm_time', 'name', 'message', 'is_critical', 'snoozed_count', 
-            'recurrence_type', 'shift_work_days', 'shift_off_days', 'shift_start_date', 
-            'intraday_repeat', 'intraday_interval', 'intraday_uom'
+            'state', 'alarm_time', 'name', 'message', 'is_critical', 'snoozed_count',
+            'recurrence_type', 'shift_work_days', 'shift_off_days', 'shift_start_date',
+            'intraday_repeat', 'intraday_interval', 'intraday_uom',
+            'ringtone_id', 'description', 'target_groups_ids', 'enable_pre_alarm', 'pre_alarm_time'
         ]
         if any(f in vals for f in fields_to_check):
             for record in self:
