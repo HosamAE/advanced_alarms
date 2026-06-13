@@ -82,7 +82,13 @@ export class AdvancedAlarmsSystrayItem extends Component {
             // Connect to bus channel
             const channel = `advanced_alarms_${session.uid}`;
             this.busService.addChannel(channel);
-            this.busService.addEventListener("notification", this.onBusNotification.bind(this));
+            if (this.busService.subscribe) {
+                this.busService.subscribe("notification", (payload) => {
+                    this.onBusNotification({ detail: [{ type: "notification", payload: payload }] });
+                });
+            } else {
+                this.busService.addEventListener("notification", this.onBusNotification.bind(this));
+            }
             
             // Start the tick timer (every 100ms for smooth UI animations/stopwatch)
             this.ticker = setInterval(() => this.tick(), 100);

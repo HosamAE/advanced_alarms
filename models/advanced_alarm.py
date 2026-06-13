@@ -8,7 +8,7 @@
 # -*- coding: utf-8 -*-
 import pytz
 from datetime import datetime, timedelta
-from odoo import models, fields, api, _
+from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 
 
@@ -20,7 +20,7 @@ class AdvancedAlarm(models.Model):
     name = fields.Char(string='Alarm Title', required=True)
     user_id = fields.Many2one('res.users', string='Assigned User', default=lambda self: self.env.user, index=True)
     group_ids = fields.Many2many('res.groups', string='Target Groups', help='If selected, this alarm will be visible to all members of these groups.')
-    alarm_time = fields.Datetime(string='Alarm Time', required=True, index=True)
+    alarm_time = fields.Datetime(string='Alarm Time', required=True, index=True, default=fields.Datetime.now)
     message = fields.Text(string='Message')
     is_critical = fields.Boolean(string='Critical Alarm', default=False)
     state = fields.Selection([
@@ -68,7 +68,7 @@ class AdvancedAlarm(models.Model):
     def _check_cycle_days_count(self):
         for record in self:
             if record.recurrence_type == 'cycle' and (record.cycle_days_count < 1 or record.cycle_days_count > 60):
-                raise ValidationError(_("Cycle Length must be between 1 and 60 days."))
+                raise ValidationError(self.env._("Cycle Length must be between 1 and 60 days."))
                 
     @api.onchange('recurrence_type', 'cycle_days_count')
     def _onchange_cycle_days_count(self):
@@ -129,7 +129,7 @@ class AdvancedAlarm(models.Model):
     def _check_pre_alarm_duration(self):
         for record in self:
             if record.pre_alarm_duration < 0:
-                raise ValidationError(_("Pre-alarm duration cannot be negative."))
+                raise ValidationError(self.env._("Pre-alarm duration cannot be negative."))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -422,7 +422,7 @@ class AdvancedAlarm(models.Model):
                 bus_channel = f"advanced_alarms_{user.id}"
                 payload = {
                     'type': 'cleanup_reminder',
-                    'message': _("You have accumulated finished alarms or timers. Please clean them up to declutter your workspace.")
+                    'message': self.env._("You have accumulated finished alarms or timers. Please clean them up to declutter your workspace.")
                 }
                 self.env['bus.bus']._sendone(bus_channel, 'notification', payload)
 

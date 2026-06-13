@@ -19,7 +19,6 @@ class AdvancedTimer(models.Model):
     duration = fields.Integer(string='Duration (Total Seconds)', required=True, default=300)
     duration_hours = fields.Integer(string='Hours', compute='_compute_duration_parts', inverse='_inverse_duration_parts', store=True)
     duration_minutes = fields.Integer(string='Minutes', compute='_compute_duration_parts', inverse='_inverse_duration_parts', store=True)
-    duration_seconds = fields.Integer(string='Seconds', compute='_compute_duration_parts', inverse='_inverse_duration_parts', store=True)
     remaining_duration = fields.Integer(string='Remaining Seconds')
     state = fields.Selection([
         ('draft', 'New'),
@@ -39,11 +38,10 @@ class AdvancedTimer(models.Model):
         for record in self:
             record.duration_hours = record.duration // 3600
             record.duration_minutes = (record.duration % 3600) // 60
-            record.duration_seconds = record.duration % 60
 
     def _inverse_duration_parts(self):
         for record in self:
-            record.duration = (record.duration_hours * 3600) + (record.duration_minutes * 60) + record.duration_seconds
+            record.duration = (record.duration_hours * 3600) + (record.duration_minutes * 60)
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -315,10 +315,7 @@
                 <span class="o_field_widget" t-esc="formattedTime"/>
             </t>
             <t t-else="">
-                <div class="o_time_picker_input_container position-relative flex-grow-1">
-                    <DateTimeInput t-props="datePickerProps"/>
-                    <i class="fa fa-clock-o o_time_picker_icon position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #666;"/>
-                </div>
+                <input type="time" t-att-value="timeValue" t-on-change="onTimeChange" class="o_input" style="cursor: pointer;"/>
             </t>
         </div>
     </t>

@@ -53,39 +53,34 @@ if (DateTimePicker.props && !DateTimePicker.props.showCalendar) {
 
 export class TimePickerField extends Component {
     static template = "advanced_alarms.TimePickerField";
-    static components = { DateTimeInput };
     static props = {
         ...standardFieldProps,
         placeholder: { type: String, optional: true },
     };
 
-    get datePickerProps() {
+    get timeValue() {
         const val = this.props.record.data[this.props.name];
-        let value = null;
         if (val) {
-            value = val;
-        } else {
-            value = DateTime.local();
+            return val.toFormat("HH:mm");
         }
+        return "12:00";
+    }
 
-        return {
-            value: value,
-            type: "datetime",
-            showCalendar: false, // Hides calendar using SCSS
-            format: localization.timeFormat,
-            rounding: 1, // Allow minute-by-minute selection
-            placeholder: this.props.placeholder || "",
-            onApply: (newValue) => {
-                const baseDate = this.props.record.data[this.props.name] || DateTime.local();
-                const updatedVal = baseDate.set({
-                    hour: newValue ? newValue.hour : 12,
-                    minute: newValue ? newValue.minute : 0,
-                    second: 0,
-                    millisecond: 0
-                });
-                this.props.record.update({ [this.props.name]: updatedVal });
-            },
-        };
+    onTimeChange(ev) {
+        const timeStr = ev.target.value; // e.g. "14:30"
+        if (!timeStr) return;
+
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        const baseDate = this.props.record.data[this.props.name] || DateTime.local();
+        
+        const updatedVal = baseDate.set({
+            hour: hours,
+            minute: minutes,
+            second: 0,
+            millisecond: 0
+        });
+        
+        this.props.record.update({ [this.props.name]: updatedVal });
     }
 
     get formattedTime() {
