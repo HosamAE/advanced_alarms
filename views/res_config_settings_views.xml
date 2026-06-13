@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Advanced Alarms & Time Management — Odoo 17
+    Copyright (c) 2024-2026 HosamAE (Hossam A. Eissa)
+    Email   : HossamA.Eissa@gmail.com
+    LinkedIn: https://www.linkedin.com/in/hossameldeen-eissa/
+
+    Licensed under the Custom Attribution License — see LICENSE file.
+    Free to use and modify; NOT allowed to re-publish under a different author name.
+-->
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.advanced_alarms</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Time Management" string="Time Management" name="advanced_alarms">
+                    <block title="Alarm Settings" name="advanced_alarms_settings">
+                        <setting string="Alarm Behavior" help="Configure default ring duration, timer repeats, pre-alarm warning lead time and retention period.">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="alarm_ring_duration" class="col-lg-4 o_light_label"/>
+                                    <field name="alarm_ring_duration"/>
+                                </div>
+                                <div class="row mt16">
+                                    <label for="timer_ring_repeat" class="col-lg-4 o_light_label"/>
+                                    <field name="timer_ring_repeat"/>
+                                </div>
+                                <div class="row mt16">
+                                    <label for="pre_alarm_duration" class="col-lg-4 o_light_label"/>
+                                    <field name="pre_alarm_duration"/>
+                                </div>
+                                <div class="row mt16">
+                                    <label for="retention_period" class="col-lg-4 o_light_label"/>
+                                    <field name="retention_period"/>
+                                </div>
+                                <div class="row mt16">
+                                    <label for="advanced_timer_sound_id" class="col-lg-4 o_light_label"/>
+                                    <field name="advanced_timer_sound_id"/>
+                                </div>
+                                <div class="row mt16">
+                                    <label for="advanced_notif_sound_id" class="col-lg-4 o_light_label"/>
+                                    <field name="advanced_notif_sound_id"/>
+                                </div>
+                            </div>
+                        </setting>
+                        <setting string="Notification &amp; Snooze" help="Configure floating notifications screen position, dismiss timeout, snooze properties, and stopwatch alerts interval.">
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label for="notif_position" class="col-lg-4 o_light_label"/>
+                                    <field name="notif_position"/>
+                                </div>
+                                <div class="row mt16">
+                                    <label for="notif_dismiss_duration" class="col-lg-4 o_light_label"/>
+                                    <field name="notif_dismiss_duration"/>
+                                </div>
+                                <div class="row mt16">
+                                    <label for="snooze_duration" class="col-lg-4 o_light_label"/>
+                                    <field name="snooze_duration"/>
+                                </div>
+                                <div class="row mt16">
+                                    <label for="snooze_limit" class="col-lg-4 o_light_label"/>
+                                    <field name="snooze_limit"/>
+                                </div>
+                                <div class="row mt16">
+                                    <label for="stopwatch_alert_interval" class="col-lg-4 o_light_label"/>
+                                    <field name="stopwatch_alert_interval"/>
+                                </div>
+                            </div>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_advanced_alarms_configuration" model="ir.actions.act_window">
+        <field name="name">Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'advanced_alarms', 'bin_size': False}</field>
+    </record>
+
+    <menuitem id="menu_advanced_alarms_configuration_root" name="Configuration" parent="menu_advanced_alarms_root" sequence="100"/>
+    <menuitem id="menu_advanced_alarms_settings" name="Settings" parent="menu_advanced_alarms_configuration_root" action="action_advanced_alarms_configuration" sequence="10"/>
+</odoo>

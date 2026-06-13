@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_advanced_alarm_user,advanced.alarm.user,model_advanced_alarm,base.group_user,1,1,0,0
+access_advanced_alarm_manager,advanced.alarm.manager,model_advanced_alarm,advanced_alarms.group_alarm_manager,1,1,1,1
+access_advanced_alarm_sound_user,advanced.alarm.sound.user,model_advanced_alarm_sound,base.group_user,1,0,0,0
+access_advanced_alarm_sound_manager,advanced.alarm.sound.manager,model_advanced_alarm_sound,advanced_alarms.group_alarm_manager,1,1,1,1
+access_advanced_timer_user,advanced.timer.user,model_advanced_timer,base.group_user,1,1,0,0
+access_advanced_timer_manager,advanced.timer.manager,model_advanced_timer,advanced_alarms.group_alarm_manager,1,1,1,1
+access_advanced_stopwatch_user,advanced.stopwatch.user,model_advanced_stopwatch,base.group_user,1,1,0,0
+access_advanced_stopwatch_manager,advanced.stopwatch.manager,model_advanced_stopwatch,advanced_alarms.group_alarm_manager,1,1,1,1
+access_advanced_world_clock,advanced.world.clock,model_advanced_world_clock,base.group_user,1,0,0,0
+access_advanced_world_clock_admin,advanced.world.clock admin,model_advanced_world_clock,base.group_system,1,1,1,1
+access_advanced_stopwatch_lap_user,advanced.stopwatch.lap user,model_advanced_stopwatch_lap,base.group_user,1,1,0,0
+access_advanced_stopwatch_lap_manager,advanced.stopwatch.lap manager,model_advanced_stopwatch_lap,advanced_alarms.group_alarm_manager,1,1,1,1
+access_advanced_alarm_cycle_day,advanced.alarm.cycle.day,model_advanced_alarm_cycle_day,base.group_user,1,1,0,0
+access_advanced_alarm_cycle_day_manager,advanced.alarm.cycle.day.manager,model_advanced_alarm_cycle_day,advanced_alarms.group_alarm_manager,1,1,1,1

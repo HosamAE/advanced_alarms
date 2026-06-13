@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Advanced Alarms & Time Management — Odoo 17
+    Copyright (c) 2024-2026 HosamAE (Hossam A. Eissa)
+    Email   : HossamA.Eissa@gmail.com
+    LinkedIn: https://www.linkedin.com/in/hossameldeen-eissa/
+
+    Licensed under the Custom Attribution License — see LICENSE file.
+    Free to use and modify; NOT allowed to re-publish under a different author name.
+-->
+<odoo>
+    <!-- Alarm Views -->
+    <record id="view_advanced_alarm_tree" model="ir.ui.view">
+        <field name="name">advanced.alarm.tree</field>
+        <field name="model">advanced.alarm</field>
+        <field name="arch" type="xml">
+            <tree decoration-danger="is_critical" decoration-muted="state in ('done', 'muted', 'cancel')">
+                <field name="name"/>
+                <field name="alarm_time"/>
+                <field name="is_critical"/>
+                <field name="state"/>
+                <field name="res_name"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_advanced_alarm_form" model="ir.ui.view">
+        <field name="name">advanced.alarm.form</field>
+        <field name="model">advanced.alarm</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_mute" string="Mute" type="object" invisible="state in ('done', 'muted', 'cancel')" class="btn-secondary"/>
+                    <button name="action_done" string="Mark as Done" type="object" invisible="state in ('done', 'muted', 'cancel')" class="btn-primary"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state in ('done', 'cancel')" class="btn-secondary"/>
+                    <button name="action_draft" string="Set to Draft" type="object" invisible="state not in ('done', 'cancel', 'muted')" class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,active,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title mb-3">
+                        <label for="name" class="oe_edit_only" string="Alarm Title"/>
+                        <h1><field name="name" placeholder="Alarm Title (e.g., Daily Standup)..."/></h1>
+                    </div>
+                    <group>
+                        <group string="Alarm Settings">
+                            <field name="alarm_time" widget="time_picker_widget"/>
+                            <field name="sound_id" domain="[('sound_type', '=', 'alarm')]" placeholder="Default Sound"/>
+                            <field name="is_critical" widget="boolean_toggle"/>
+                            <field name="user_id" widget="many2one_avatar_user" options="{'no_create': True}"/>
+                            <field name="group_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                        </group>
+                        <group string="Recurrence &amp; Notifications">
+                            <field name="recurrence_type" widget="selection_badge"/>
+                            <field name="pre_alarm" widget="boolean_toggle"/>
+                            <field name="pre_alarm_duration" invisible="not pre_alarm"/>
+                            <field name="snoozed_count" readonly="1" invisible="snoozed_count == 0"/>
+                        </group>
+                    </group>
+                    <group string="Shift Schedule" invisible="recurrence_type != 'shift'">
+                        <group>
+                            <field name="shift_start_date"/>
+                            <label for="shift_work_days" string="Cycle Pattern"/>
+                            <div class="d-flex align-items-center">
+                                <field name="shift_work_days" class="oe_inline text-center" style="width: 40px;"/>
+                                <span class="mx-2">Work Days, then</span>
+                                <field name="shift_off_days" class="oe_inline text-center" style="width: 40px;"/>
+                                <span class="mx-2">Off Days</span>
+                            </div>
+                        </group>
+                    </group>
+                    <group string="Repeat During the Day (Intraday)" invisible="recurrence_type not in ('custom', 'shift')">
+                        <field name="intraday_repeat" widget="boolean_toggle"/>
+                        <div class="d-flex align-items-center" invisible="not intraday_repeat">
+                            <span class="me-2">Ring every</span>
+                            <field name="intraday_interval" class="oe_inline text-center" style="width: 60px;"/>
+                            <field name="intraday_uom" class="oe_inline ms-2" style="width: 100px;"/>
+                        </div>
+                    </group>
+                    
+                    <group string="Next Scheduled Alarm" invisible="recurrence_type in ('once', 'scrum')">
+                        <field name="next_run_datetime" readonly="1" decoration-success="1" decoration-bf="1"/>
+                    </group>
+
+                    <group string="30-Day Cycle Configuration" invisible="recurrence_type != 'cycle'">
+                        <group>
+                            <field name="cycle_start_date"/>
+                            <field name="cycle_days_count"/>
+                        </group>
+                    </group>
+                    <group string="Repeat Days" invisible="recurrence_type != 'custom'">
+                        <div class="o_weekday_selector_container">
+                            <field name="recur_mon" widget="weekday_selector" nolabel="1"/>
+                            <field name="recur_tue" invisible="1"/>
+                            <field name="recur_wed" invisible="1"/>
+                            <field name="recur_thu" invisible="1"/>
+                            <field name="recur_fri" invisible="1"/>
+                            <field name="recur_sat" invisible="1"/>
+                            <field name="recur_sun" invisible="1"/>
+                        </div>
+                    </group>
+                    <notebook>
+                        <page string="Cycle Builder" invisible="recurrence_type != 'cycle'">
+                            <field name="cycle_day_ids" nolabel="1" context="{'default_alarm_id': id}">
+                                <tree editable="bottom" create="0" delete="0">
+                                    <field name="day_index" readonly="0" force_save="1" decoration-bf="1" string="Day #"/>
+                                    <field name="day_name" readonly="1" force_save="1"/>
+                                    <field name="date" readonly="1" force_save="1"/>
+                                    <field name="is_active" widget="boolean_toggle"/>
+                                    <field name="alarm_time" widget="float_time" invisible="not is_active"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Description">
+                            <field name="message" placeholder="Alarm description or reminder note..."/>
+                        </page>
+                        <page string="Linked Record" groups="base.group_no_one">
+                            <group>
+                                <field name="res_model" readonly="1"/>
+                                <field name="res_id" readonly="1"/>
+                                <field name="res_name" readonly="1"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_advanced_alarm" model="ir.actions.act_window">
+        <field name="name">Alarms</field>
+        <field name="res_model">advanced.alarm</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first alarm!
+            </p>
+        </field>
+    </record>
+
+    <!-- Timer Views -->
+    <record id="view_advanced_timer_tree" model="ir.ui.view">
+        <field name="name">advanced.timer.tree</field>
+        <field name="model">advanced.timer</field>
+        <field name="arch" type="xml">
+            <tree decoration-info="state == 'running'" decoration-muted="state in ('done', 'cancel')" decoration-warning="state == 'paused'">
+                <field name="name"/>
+                <field name="duration" string="Duration (Seconds)"/>
+                <field name="state"/>
+                <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_advanced_timer_form" model="ir.ui.view">
+        <field name="name">advanced.timer.form</field>
+        <field name="model">advanced.timer</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" string="Start" type="object" invisible="state in ('running', 'done', 'cancel')" class="btn-primary"/>
+                    <button name="action_pause" string="Pause" type="object" invisible="state != 'running'" class="btn-secondary"/>
+                    <button name="action_reset" string="Reset" type="object" invisible="state in ('draft', 'done', 'cancel')" class="btn-secondary"/>
+                    <button name="action_cancel" string="Cancel" type="object" invisible="state in ('done', 'cancel')" class="btn-secondary"/>
+                    <button name="action_draft" string="Set to Draft" type="object" invisible="state not in ('done', 'cancel')" class="btn-secondary"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,running,done"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <label for="duration_hours" string="Duration (HH:MM:SS)"/>
+                        <div class="o_row">
+                            <field name="duration_hours" class="oe_inline text-center fw-bold" style="width: 3rem;" placeholder="HH"/> :
+                            <field name="duration_minutes" class="oe_inline text-center fw-bold" style="width: 3rem;" placeholder="MM"/> :
+                            <field name="duration_seconds" class="oe_inline text-center fw-bold" style="width: 3rem;" placeholder="SS"/>
+                        </div>
+                        <field name="sound_id" domain="[('sound_type', '=', 'timer')]"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_advanced_timer" model="ir.actions.act_window">
+        <field name="name">Timers</field>
+        <field name="res_model">advanced.timer</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Stopwatch Views -->
+    <record id="view_advanced_stopwatch_tree" model="ir.ui.view">
+        <field name="name">advanced.stopwatch.tree</field>
+        <field name="model">advanced.stopwatch</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="state"/>
+                <field name="alert_interval"/>
+                <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_advanced_stopwatch_form" model="ir.ui.view">
+        <field name="name">advanced.stopwatch.form</field>
+        <field name="model">advanced.stopwatch</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_start" string="Start" type="object" invisible="state == 'running'" class="btn-primary"/>
+                    <button name="action_pause" string="Pause" type="object" invisible="state != 'running'" class="btn-secondary"/>
+                    <button name="action_lap" string="Lap" type="object" invisible="state != 'running'" class="btn-info"/>
+                    <button name="action_reset" string="Reset" type="object" invisible="state == 'draft'" class="btn-secondary"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title mb-3">
+                        <h1><field name="display_timer" widget="stopwatch_timer" readonly="1" class="text-primary"/></h1>
+                    </div>
+                    <group>
+                        <field name="name"/>
+                        <field name="alert_interval"/>
+                        <field name="show_in_systray" widget="boolean_toggle"/>
+                        <field name="accumulated_paused" invisible="1"/>
+                        <field name="start_time" invisible="1"/>
+                        <field name="paused_time" invisible="1"/>
+                    </group>
+                    <notebook>
+                        <page string="Laps">
+                            <field name="lap_ids" readonly="1">
+                                <tree>
+                                    <field name="lap_number"/>
+                                    <field name="lap_time_str"/>
+                                    <field name="diff_time_str"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_advanced_stopwatch" model="ir.actions.act_window">
+        <field name="name">Stopwatches</field>
+        <field name="res_model">advanced.stopwatch</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Sound Views -->
+    <record id="view_advanced_alarm_sound_tree" model="ir.ui.view">
+        <field name="name">advanced.alarm.sound.tree</field>
+        <field name="model">advanced.alarm.sound</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="sound_type"/>
+                <field name="is_default"/>
+                <field name="user_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_advanced_alarm_sound_form" model="ir.ui.view">
+        <field name="name">advanced.alarm.sound.form</field>
+        <field name="model">advanced.alarm.sound</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="sound_type"/>
+                        <field name="file" filename="file_name"/>
+                        <field name="file_name" invisible="1"/>
+                        <field name="is_default" groups="base.group_no_one"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_advanced_alarm_sound" model="ir.actions.act_window">
+        <field name="name">Sounds</field>
+        <field name="res_model">advanced.alarm.sound</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Cron Jobs -->
+    <record id="ir_cron_clean_old_alarms" model="ir.cron">
+        <field name="name">Alarms: Clean Old Alarms</field>
+        <field name="model_id" ref="model_advanced_alarm"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_clean_old_alarms()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="True"/>
+    </record>
+    
+    <record id="ir_cron_remind_cleanup" model="ir.cron">
+        <field name="name">Alarms: Remind Users to Cleanup</field>
+        <field name="model_id" ref="model_advanced_alarm"/>
+        <field name="state">code</field>
+        <field name="code">model.cron_remind_cleanup()</field>
+        <field name="interval_number">7</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="active" eval="True"/>
+    </record>
+
+    <!-- Menu Structure -->
+    <menuitem id="menu_advanced_alarms_root" name="Time Management" sequence="10" web_icon="advanced_alarms,static/description/icon.png" groups="advanced_alarms.group_alarm_manager"/>
+    <menuitem id="menu_advanced_alarm" name="Alarms" parent="menu_advanced_alarms_root" action="action_advanced_alarm" sequence="10"/>
+    <menuitem id="menu_advanced_timer" name="Timers" parent="menu_advanced_alarms_root" action="action_advanced_timer" sequence="20"/>
+    <menuitem id="menu_advanced_stopwatch" name="Stopwatches" parent="menu_advanced_alarms_root" action="action_advanced_stopwatch" sequence="30"/>
+    <menuitem id="menu_advanced_alarm_sound" name="Sounds" parent="menu_advanced_alarms_root" action="action_advanced_alarm_sound" sequence="40"/>
+</odoo>

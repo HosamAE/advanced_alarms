@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Advanced Alarms & Time Management — Odoo 17
+    Copyright (c) 2024-2026 HosamAE (Hossam A. Eissa)
+    Email   : HossamA.Eissa@gmail.com
+    LinkedIn: https://www.linkedin.com/in/hossameldeen-eissa/
+
+    Licensed under the Custom Attribution License — see LICENSE file.
+    Free to use and modify; NOT allowed to re-publish under a different author name.
+-->
+<odoo>
+    <data noupdate="1">
+        <!-- Rules for Advanced Alarm -->
+        <record id="rule_advanced_alarm_user" model="ir.rule">
+            <field name="name">Personal Alarms</field>
+            <field name="model_id" ref="model_advanced_alarm"/>
+            <field name="domain_force">['|', ('user_id', '=', user.id), ('group_ids', 'in', user.groups_id.ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        <record id="rule_advanced_alarm_manager" model="ir.rule">
+            <field name="name">All Alarms</field>
+            <field name="model_id" ref="model_advanced_alarm"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('advanced_alarms.group_alarm_manager'))]"/>
+        </record>
+
+        <!-- Rules for Alarm Sounds -->
+        <record id="rule_advanced_alarm_sound_user" model="ir.rule">
+            <field name="name">Access Personal or Global Sounds</field>
+            <field name="model_id" ref="model_advanced_alarm_sound"/>
+            <field name="domain_force">['|', '|', ('user_id', '=', user.id), ('is_default', '=', True), ('user_id', '=', False)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        <record id="rule_advanced_alarm_sound_manager" model="ir.rule">
+            <field name="name">All Sounds</field>
+            <field name="model_id" ref="model_advanced_alarm_sound"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('advanced_alarms.group_alarm_manager'))]"/>
+        </record>
+
+        <!-- Rules for Advanced Timer -->
+        <record id="rule_advanced_timer_user" model="ir.rule">
+            <field name="name">Personal Timers</field>
+            <field name="model_id" ref="model_advanced_timer"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        <record id="rule_advanced_timer_manager" model="ir.rule">
+            <field name="name">All Timers</field>
+            <field name="model_id" ref="model_advanced_timer"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('advanced_alarms.group_alarm_manager'))]"/>
+        </record>
+
+        <!-- Rules for Advanced Stopwatch -->
+        <record id="rule_advanced_stopwatch_user" model="ir.rule">
+            <field name="name">Personal Stopwatches</field>
+            <field name="model_id" ref="model_advanced_stopwatch"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        <record id="rule_advanced_stopwatch_manager" model="ir.rule">
+            <field name="name">All Stopwatches</field>
+            <field name="model_id" ref="model_advanced_stopwatch"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('advanced_alarms.group_alarm_manager'))]"/>
+        </record>
+    </data>
+</odoo>

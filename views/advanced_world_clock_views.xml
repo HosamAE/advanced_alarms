@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Advanced Alarms & Time Management — Odoo 17
+    Copyright (c) 2024-2026 HosamAE (Hossam A. Eissa)
+    Email   : HossamA.Eissa@gmail.com
+    LinkedIn: https://www.linkedin.com/in/hossameldeen-eissa/
+
+    Licensed under the Custom Attribution License — see LICENSE file.
+    Free to use and modify; NOT allowed to re-publish under a different author name.
+-->
+<odoo>
+
+    <record id="view_advanced_world_clock_tree" model="ir.ui.view">
+        <field name="name">advanced.world.clock.tree</field>
+        <field name="model">advanced.world.clock</field>
+        <field name="arch" type="xml">
+            <tree string="World Clocks">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="timezone"/>
+                <field name="dst_mode"/>
+                <field name="is_pinned_by_default"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_advanced_world_clock_form" model="ir.ui.view">
+        <field name="name">advanced.world.clock.form</field>
+        <field name="model">advanced.world.clock</field>
+        <field name="arch" type="xml">
+            <form string="World Clock">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="e.g. Cairo (Egypt)"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="timezone"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="dst_mode"/>
+                            <field name="is_pinned_by_default"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_advanced_world_clock" model="ir.actions.act_window">
+        <field name="name">World Clocks</field>
+        <field name="res_model">advanced.world.clock</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_advanced_world_clock" 
+              name="World Clocks" 
+              parent="menu_advanced_alarms_root" 
+              action="action_advanced_world_clock" 
+              sequence="40"/>
+
+</odoo>

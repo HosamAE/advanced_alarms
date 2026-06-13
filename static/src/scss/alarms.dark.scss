@@ -1,0 +1,247 @@
+/**
+ * Advanced Alarms & Time Management — Odoo 17
+ * Copyright (c) 2024-2026 HosamAE (Hossam A. Eissa)
+ * Email   : HossamA.Eissa@gmail.com
+ * LinkedIn: https://www.linkedin.com/in/hossameldeen-eissa/
+ *
+ * Licensed under the Custom Attribution License — see LICENSE file.
+ */
+
+// This file is loaded in the web.assets_web_dark bundle.
+// Since it's only loaded in dark mode, we use the direct class names without needing a .o_dark_mode wrapper.
+
+/* Dropdown Container */
+.o_advanced_alarms_dropdown {
+    border: 1px solid #3b3b3b !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4) !important;
+    background: #1e1e1e;
+
+    .dropdown-header-custom {
+        background: #1e1e1e;
+        border-bottom: 1px solid #3b3b3b;
+
+        .tabs-header {
+            .tab-btn {
+                color: #a0aec0;
+                
+                &.active {
+                    color: #0bd1d9; /* Lighter teal for dark mode */
+                    border-bottom-color: #0bd1d9;
+                }
+
+                &:hover:not(.active) {
+                    color: #e2e8f0;
+                }
+            }
+        }
+
+        .btn-add-alarm {
+            color: #0bd1d9;
+
+            &:hover {
+                color: #4fd1c5;
+            }
+        }
+    }
+
+    /* Tab Content */
+    .tab-content-area {
+        background: #121212;
+
+        /* Empty State */
+        .empty-state {
+            color: #718096;
+        }
+    }
+}
+
+/* Timeline/List Items */
+.alarm-item-card, .timer-item-card, .stopwatch-item-card, .world-clock-card {
+    background: #1e1e1e;
+    border: 1px solid #3b3b3b;
+    
+    &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .item-info {
+        .item-title {
+            color: #f7fafc !important;
+        }
+        
+        .item-time {
+            color: #a0aec0 !important;
+        }
+    }
+
+    .item-actions {
+        .action-btn {
+            color: #718096;
+            &:hover {
+                color: #e2e8f0;
+                background: #2d3748;
+            }
+        }
+    }
+
+    &.muted-state {
+        background: #2d3748 !important;
+        border-color: #4a5568 !important;
+        .item-info .item-title {
+            color: #718096 !important;
+        }
+    }
+
+    /* Keep the gradient borders but make backgrounds dark */
+    &.type-once {
+        background: linear-gradient(to right, rgba(59, 130, 246, 0.15), #1e1e1e);
+    }
+    &.type-cycle {
+        background: linear-gradient(to right, rgba(16, 185, 129, 0.15), #1e1e1e);
+    }
+    &.type-scrum {
+        background: linear-gradient(to right, rgba(239, 68, 68, 0.15), #1e1e1e);
+    }
+    &.type-shift {
+        background: linear-gradient(to right, rgba(245, 158, 11, 0.15), #1e1e1e);
+    }
+    &.type-custom {
+        background: linear-gradient(to right, rgba(139, 92, 246, 0.15), #1e1e1e);
+    }
+}
+
+/* In-dropdown Timer Forms */
+.new-timer-form {
+    .form-control {
+        background-color: #2d3748;
+        border-color: #4a5568;
+        color: #f7fafc;
+        &:focus {
+            background-color: #1a202c;
+            border-color: #0bd1d9;
+            color: #fff;
+        }
+    }
+    label {
+        color: #a0aec0;
+    }
+    .btn-create-timer {
+        background-color: #0bd1d9;
+        color: #1a202c;
+        &:hover {
+            background-color: #4fd1c5;
+        }
+    }
+}
+
+/* Stopwatches */
+.o_advanced_stopwatch_container {
+    background: rgba(30, 30, 30, 0.95);
+    border: 1px solid #444;
+    color: #f1f1f1;
+    
+    .o_stopwatch_time {
+        color: #fff;
+    }
+    
+    .o_stopwatch_lap_list {
+        .o_stopwatch_lap_item {
+            border-bottom: 1px solid #444;
+            color: #ccc;
+        }
+    }
+}
+
+/* Time Picker & Widgets in Form Views */
+.o_time_picker_widget, .o_weekday_selector_widget {
+    background: #1e1e1e;
+    color: #f1f1f1;
+    border-color: #444;
+    
+    input {
+        background: #121212;
+        color: #fff;
+        border-color: #555;
+    }
+}
+
+/* Local Time / World Clock Preview */
+.o_advanced_alarms_dropdown {
+    .world-clock-main {
+        background-color: #2d3748 !important;
+        border-color: #4a5568 !important;
+        
+        .digital-clock-large {
+            color: #63b3ed !important; /* Calmer blue/primary equivalent for dark mode */
+        }
+        
+        .digital-clock-date {
+            color: #a0aec0 !important;
+        }
+
+        .text-primary {
+            color: #63b3ed !important;
+        }
+    }
+}
+
+/* Floating Notifications */
+.o_advanced_alarms_notification {
+    background: rgba(30, 30, 30, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+
+    .notif-header {
+        .notif-title-group {
+            color: #f7fafc !important;
+            i {
+                color: #63b3ed !important;
+            }
+        }
+        .btn-close-notif {
+            color: #a0aec0 !important;
+            &:hover {
+                color: #e2e8f0 !important;
+                background: rgba(255, 255, 255, 0.1) !important;
+            }
+        }
+    }
+
+    .notif-body {
+        color: #e2e8f0 !important;
+    }
+
+    .notif-footer {
+        .link-record {
+            color: #63b3ed !important;
+        }
+        .time-ago {
+            color: #a0aec0 !important;
+        }
+    }
+}
+
+/* Floating Glassmorphic Clock */
+.o_advanced_alarms_floating_clock {
+    background: rgba(30, 30, 30, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5) !important;
+
+    .floating-clock-header {
+        color: #a0aec0 !important;
+        span.text-primary, span.fw-bold.text-primary {
+            color: #a0aec0 !important;
+        }
+        i {
+            color: #a0aec0 !important;
+        }
+    }
+
+    .floating-clock-time {
+        color: #63b3ed !important;
+    }
+    
+    .floating-clock-date {
+        color: #718096 !important;
+    }
+}

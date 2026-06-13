@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Advanced Alarms & Time Management — Odoo 17
+    Copyright (c) 2024-2026 HosamAE (Hossam A. Eissa)
+    Email   : HossamA.Eissa@gmail.com
+    LinkedIn: https://www.linkedin.com/in/hossameldeen-eissa/
+
+    Licensed under the Custom Attribution License — see LICENSE file.
+    Free to use and modify; NOT allowed to re-publish under a different author name.
+-->
+<templates xml:space="preserve">
+    <t t-name="advanced_alarms.StopwatchTimerWidget" owl="1">
+        <div class="o_field_stopwatch_timer fw-bold text-primary font-monospace" style="font-size: 2.5rem; letter-spacing: 2px;">
+            <t t-esc="state.formattedTime"/>
+        </div>
+    </t>
+</templates>
