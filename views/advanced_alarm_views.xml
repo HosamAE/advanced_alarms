@@ -14,14 +14,14 @@
         <field name="name">advanced.alarm.tree</field>
         <field name="model">advanced.alarm</field>
         <field name="arch" type="xml">
-            <tree decoration-danger="is_critical" decoration-muted="state in ('done', 'muted', 'cancel')">
+            <list decoration-danger="is_critical" decoration-muted="state in ('done', 'muted', 'cancel')">
                 <field name="name"/>
                 <field name="alarm_time"/>
                 <field name="is_critical"/>
                 <field name="state"/>
                 <field name="res_name"/>
                 <field name="user_id" widget="many2one_avatar_user"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -102,13 +102,13 @@
                     <notebook>
                         <page string="Cycle Builder" invisible="recurrence_type != 'cycle'">
                             <field name="cycle_day_ids" nolabel="1" context="{'default_alarm_id': id}">
-                                <tree editable="bottom" create="0" delete="0">
+                                <list editable="bottom" create="0" delete="0">
                                     <field name="day_index" readonly="0" force_save="1" decoration-bf="1" string="Day #"/>
                                     <field name="day_name" readonly="1" force_save="1"/>
                                     <field name="date" readonly="1" force_save="1"/>
                                     <field name="is_active" widget="boolean_toggle"/>
                                     <field name="alarm_time" widget="float_time" invisible="not is_active"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="Description">
@@ -130,7 +130,7 @@
     <record id="action_advanced_alarm" model="ir.actions.act_window">
         <field name="name">Alarms</field>
         <field name="res_model">advanced.alarm</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Create your first alarm!
@@ -143,12 +143,12 @@
         <field name="name">advanced.timer.tree</field>
         <field name="model">advanced.timer</field>
         <field name="arch" type="xml">
-            <tree decoration-info="state == 'running'" decoration-muted="state in ('done', 'cancel')" decoration-warning="state == 'paused'">
+            <list decoration-info="state == 'running'" decoration-muted="state in ('done', 'cancel')" decoration-warning="state == 'paused'">
                 <field name="name"/>
                 <field name="duration" string="Duration (Seconds)"/>
                 <field name="state"/>
                 <field name="user_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -184,7 +184,7 @@
     <record id="action_advanced_timer" model="ir.actions.act_window">
         <field name="name">Timers</field>
         <field name="res_model">advanced.timer</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <!-- Stopwatch Views -->
@@ -192,12 +192,12 @@
         <field name="name">advanced.stopwatch.tree</field>
         <field name="model">advanced.stopwatch</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="state"/>
                 <field name="alert_interval"/>
                 <field name="user_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -228,11 +228,11 @@
                     <notebook>
                         <page string="Laps">
                             <field name="lap_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="lap_number"/>
                                     <field name="lap_time_str"/>
                                     <field name="diff_time_str"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -244,7 +244,7 @@
     <record id="action_advanced_stopwatch" model="ir.actions.act_window">
         <field name="name">Stopwatches</field>
         <field name="res_model">advanced.stopwatch</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <!-- Sound Views -->
@@ -252,12 +252,12 @@
         <field name="name">advanced.alarm.sound.tree</field>
         <field name="model">advanced.alarm.sound</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="sound_type"/>
                 <field name="is_default"/>
                 <field name="user_id"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -282,7 +282,7 @@
     <record id="action_advanced_alarm_sound" model="ir.actions.act_window">
         <field name="name">Sounds</field>
         <field name="res_model">advanced.alarm.sound</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <!-- Cron Jobs -->

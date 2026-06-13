@@ -1,11 +1,11 @@
 {
     'name': 'Advanced Alarms & Time Management',
-    'version': '17.0.1.0.0',
+    'version': '18.0.1.0.0',
     'summary': 'Smart Alarms, Timers & Stopwatches with Systray Integration',
     'description': """
         Advanced Alarms & Time Management
         ==================================
-        A powerful productivity module for Odoo 17 that brings a full-featured
+        A powerful productivity module for Odoo 18 that brings a full-featured
         time management suite directly into your Odoo interface.
 
         ✅ Key Features:
