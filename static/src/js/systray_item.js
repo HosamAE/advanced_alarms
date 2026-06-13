@@ -12,7 +12,6 @@
 import { Component, useState, onWillStart, onWillUnmount } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { session } from "@web/session";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 
 // Format helper to pad numbers
@@ -78,10 +77,6 @@ export class AdvancedAlarmsSystrayItem extends Component {
         onWillStart(async () => {
             await this.loadUserSettings();
             await this.loadData();
-            
-            // Connect to bus channel
-            const channel = `advanced_alarms_${session.uid}`;
-            this.busService.addChannel(channel);
             // Listen for Bus events (real-time updates)
             if (this.busService.subscribe) {
                 this.busService.subscribe("advanced_alarms/update", (payload) => {
@@ -279,6 +274,9 @@ export class AdvancedAlarmsSystrayItem extends Component {
             }
         }
         if (shouldReload) {
+            if (this.env.services.notification) {
+                this.env.services.notification.add("Live Update Triggered!", { type: "info" });
+            }
             this.loadData();
         }
     }

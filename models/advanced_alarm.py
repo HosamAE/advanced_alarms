@@ -336,7 +336,7 @@ class AdvancedAlarm(models.Model):
             'snoozed_count': self.snoozed_count,
             'snooze_limit_reached': self.snoozed_count >= int(self.env['ir.config_parameter'].sudo().get_param('advanced_alarms.snooze_limit', 3)),
         }
-        self.env['bus.bus']._sendone(bus_channel, 'advanced_alarms/update', payload)
+        self.env['bus.bus']._sendone(self.user_id.partner_id, 'advanced_alarms/update', payload)
 
     @api.model
     def get_todays_alarms(self):
@@ -420,12 +420,11 @@ class AdvancedAlarm(models.Model):
             ])
             
             if done_alarms_count > 10 or done_timers_count > 10:
-                bus_channel = f"advanced_alarms_{user.id}"
                 payload = {
                     'type': 'cleanup_reminder',
                     'message': self.env._("You have accumulated finished alarms or timers. Please clean them up to declutter your workspace.")
                 }
-                self.env['bus.bus']._sendone(bus_channel, 'advanced_alarms/update', payload)
+                self.env['bus.bus']._sendone(user.partner_id, 'advanced_alarms/update', payload)
 
     @api.model
     def action_clear_muted_alarms(self):
