@@ -315,7 +315,19 @@
                 <span class="o_field_widget" t-esc="formattedTime"/>
             </t>
             <t t-else="">
-                <input type="time" t-att-value="timeValue" t-on-change="onTimeChange" class="o_input" style="cursor: pointer;"/>
+                <div class="d-flex align-items-center gap-1">
+                    <select class="o_input text-center" style="width: 3.5rem; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; padding: 2px;" t-att-value="currentHour" t-on-change="onHourChange">
+                        <t t-foreach="hours" t-as="h" t-key="h">
+                            <option t-att-value="h"><t t-esc="h"/></option>
+                        </t>
+                    </select>
+                    <span class="fw-bold px-1">:</span>
+                    <select class="o_input text-center" style="width: 3.5rem; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; padding: 2px;" t-att-value="currentMinute" t-on-change="onMinuteChange">
+                        <t t-foreach="minutes" t-as="m" t-key="m">
+                            <option t-att-value="m"><t t-esc="m"/></option>
+                        </t>
+                    </select>
+                </div>
             </t>
         </div>
     </t>

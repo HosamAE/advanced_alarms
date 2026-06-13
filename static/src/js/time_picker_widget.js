@@ -58,24 +58,38 @@ export class TimePickerField extends Component {
         placeholder: { type: String, optional: true },
     };
 
-    get timeValue() {
-        const val = this.props.record.data[this.props.name];
-        if (val) {
-            return val.toFormat("HH:mm");
-        }
-        return "12:00";
+    setup() {
+        super.setup(...arguments);
+        this.hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+        this.minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
     }
 
-    onTimeChange(ev) {
-        const timeStr = ev.target.value; // e.g. "14:30"
-        if (!timeStr) return;
+    get currentHour() {
+        const val = this.props.record.data[this.props.name];
+        return val ? String(val.hour).padStart(2, '0') : "12";
+    }
 
-        const [hours, minutes] = timeStr.split(':').map(Number);
+    get currentMinute() {
+        const val = this.props.record.data[this.props.name];
+        return val ? String(val.minute).padStart(2, '0') : "00";
+    }
+
+    onHourChange(ev) {
+        this.updateTime(ev.target.value, this.currentMinute);
+    }
+
+    onMinuteChange(ev) {
+        this.updateTime(this.currentHour, ev.target.value);
+    }
+
+    updateTime(hourStr, minuteStr) {
+        const h = parseInt(hourStr, 10) || 0;
+        const m = parseInt(minuteStr, 10) || 0;
+
         const baseDate = this.props.record.data[this.props.name] || DateTime.local();
-        
         const updatedVal = baseDate.set({
-            hour: hours,
-            minute: minutes,
+            hour: h,
+            minute: m,
             second: 0,
             millisecond: 0
         });
