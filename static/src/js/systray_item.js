@@ -81,6 +81,7 @@ export class AdvancedAlarmsSystrayItem extends Component {
             
             // Connect to bus channel
             const channel = `advanced_alarms_${session.uid}`;
+            this.busService.addChannel(channel);
             // Listen for Bus events (real-time updates)
             if (this.busService.subscribe) {
                 this.busService.subscribe("advanced_alarms/update", (payload) => {
