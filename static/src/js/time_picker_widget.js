@@ -64,13 +64,25 @@ export class TimePickerField extends Component {
         this.minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
     }
 
+    get parsedDate() {
+        let val = this.props.record.data[this.props.name];
+        if (!val) return null;
+        if (typeof val === "string") {
+            // Odoo 19 datetime fields might be passed as strings occasionally
+            // In Odoo 19, we typically import deserializeDateTime, but since we don't have it explicitly imported here, 
+            // we can parse it using luxon DateTime from UTC to Local.
+            val = luxon.DateTime.fromSQL(val, { zone: "utc" }).setZone(luxon.Settings.defaultZone);
+        }
+        return val;
+    }
+
     get currentHour() {
-        const val = this.props.record.data[this.props.name];
+        const val = this.parsedDate;
         return val ? String(val.hour).padStart(2, '0') : "12";
     }
 
     get currentMinute() {
-        const val = this.props.record.data[this.props.name];
+        const val = this.parsedDate;
         return val ? String(val.minute).padStart(2, '0') : "00";
     }
 

@@ -81,13 +81,13 @@ export class AdvancedAlarmsSystrayItem extends Component {
             
             // Connect to bus channel
             const channel = `advanced_alarms_${session.uid}`;
-            this.busService.addChannel(channel);
+            // Listen for Bus events (real-time updates)
             if (this.busService.subscribe) {
-                this.busService.subscribe("notification", (payload) => {
-                    this.onBusNotification({ detail: [{ type: "notification", payload: payload }] });
+                this.busService.subscribe("advanced_alarms/update", (payload) => {
+                    this.onBusNotification({ detail: [{ type: "advanced_alarms/update", payload: payload }] });
                 });
             } else {
-                this.busService.addEventListener("notification", this.onBusNotification.bind(this));
+                this.busService.addEventListener("advanced_alarms/update", this.onBusNotification.bind(this));
             }
             
             // Start the tick timer (every 100ms for smooth UI animations/stopwatch)
@@ -257,7 +257,7 @@ export class AdvancedAlarmsSystrayItem extends Component {
     onBusNotification({ detail }) {
         let shouldReload = false;
         for (const message of detail) {
-            if (message.type === 'notification' && message.payload) {
+            if (message.type === 'advanced_alarms/update' && message.payload) {
                 const payload = message.payload;
                 if (payload.type === 'alarm_update') {
                     shouldReload = true;

@@ -316,17 +316,19 @@
             </t>
             <t t-else="">
                 <div class="d-flex align-items-center gap-1">
-                    <select class="o_input text-center" style="width: 3.5rem; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; padding: 2px;" t-att-value="currentHour" t-on-change="onHourChange">
+                    <input type="text" class="o_input text-center" style="width: 3.5rem; padding: 2px;" list="hourList" t-att-value="currentHour" t-on-change="onHourChange"/>
+                    <datalist id="hourList">
                         <t t-foreach="hours" t-as="h" t-key="h">
                             <option t-att-value="h"><t t-esc="h"/></option>
                         </t>
-                    </select>
+                    </datalist>
                     <span class="fw-bold px-1">:</span>
-                    <select class="o_input text-center" style="width: 3.5rem; cursor: pointer; appearance: none; -webkit-appearance: none; -moz-appearance: none; padding: 2px;" t-att-value="currentMinute" t-on-change="onMinuteChange">
+                    <input type="text" class="o_input text-center" style="width: 3.5rem; padding: 2px;" list="minuteList" t-att-value="currentMinute" t-on-change="onMinuteChange"/>
+                    <datalist id="minuteList">
                         <t t-foreach="minutes" t-as="m" t-key="m">
                             <option t-att-value="m"><t t-esc="m"/></option>
                         </t>
-                    </select>
+                    </datalist>
                 </div>
             </t>
         </div>

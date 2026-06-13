@@ -133,7 +133,7 @@ class AdvancedTimer(models.Model):
             'paused_time': fields.Datetime.to_string(self.paused_time) if self.paused_time else False,
             'sound_src': f"/web/content/advanced.alarm.sound/{self.sound_id.id}/file" if self.sound_id else "",
         }
-        self.env['bus.bus']._sendone(bus_channel, 'notification', payload)
+        self.env['bus.bus']._sendone(bus_channel, 'advanced_alarms/update', payload)
 
     @api.model
     def get_active_timers(self):
