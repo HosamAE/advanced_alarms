@@ -8,7 +8,7 @@
 # -*- coding: utf-8 -*-
 import pytz
 from datetime import datetime, timedelta
-from odoo import models, fields, api, _
+from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 
 
@@ -32,7 +32,13 @@ class AdvancedAlarm(models.Model):
         ('cancel', 'Cancelled')
     ], string='Status', default='pending', required=True, index=True)
     
-    sound_id = fields.Many2one('advanced.alarm.sound', string='Ringtone')
+    @api.model
+    def _default_sound_id(self):
+        if hasattr(self.env.user, 'alarm_sound_id') and self.env.user.alarm_sound_id:
+            return self.env.user.alarm_sound_id.id
+        return self.env.company.advanced_alarm_sound_id.id
+
+    sound_id = fields.Many2one('advanced.alarm.sound', string='Ringtone', default=_default_sound_id)
     
     pre_alarm = fields.Boolean(string='Enable Pre-alarm', default=True)
     pre_alarm_duration = fields.Integer(string='Pre-alarm Time (Minutes)', default=5)
@@ -68,7 +74,7 @@ class AdvancedAlarm(models.Model):
     def _check_cycle_days_count(self):
         for record in self:
             if record.recurrence_type == 'cycle' and (record.cycle_days_count < 1 or record.cycle_days_count > 60):
-                raise ValidationError(_("Cycle Length must be between 1 and 60 days."))
+                raise ValidationError(self.env._("Cycle Length must be between 1 and 60 days."))
                 
     @api.onchange('recurrence_type', 'cycle_days_count')
     def _onchange_cycle_days_count(self):
@@ -129,7 +135,7 @@ class AdvancedAlarm(models.Model):
     def _check_pre_alarm_duration(self):
         for record in self:
             if record.pre_alarm_duration < 0:
-                raise ValidationError(_("Pre-alarm duration cannot be negative."))
+                raise ValidationError(self.env._("Pre-alarm duration cannot be negative."))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -143,7 +149,8 @@ class AdvancedAlarm(models.Model):
         fields_to_check = [
             'state', 'alarm_time', 'name', 'message', 'is_critical', 'snoozed_count', 
             'recurrence_type', 'shift_work_days', 'shift_off_days', 'shift_start_date', 
-            'intraday_repeat', 'intraday_interval', 'intraday_uom'
+            'intraday_repeat', 'intraday_interval', 'intraday_uom',
+            'sound_id', 'group_ids', 'pre_alarm', 'pre_alarm_duration'
         ]
         if any(f in vals for f in fields_to_check):
             for record in self:
@@ -315,7 +322,6 @@ class AdvancedAlarm(models.Model):
     def _send_bus_notification(self, action_type):
         """Send a real-time message via Odoo Bus to the user's browser."""
         self.ensure_one()
-        bus_channel = f"advanced_alarms_{self.user_id.id}"
         payload = {
             'type': 'alarm_update',
             'id': self.id,
@@ -335,7 +341,7 @@ class AdvancedAlarm(models.Model):
             'snoozed_count': self.snoozed_count,
             'snooze_limit_reached': self.snoozed_count >= int(self.env['ir.config_parameter'].sudo().get_param('advanced_alarms.snooze_limit', 3)),
         }
-        self.env['bus.bus']._sendone(bus_channel, 'notification', payload)
+        self.env['bus.bus']._sendone(self.user_id.partner_id, 'advanced_alarms/update', payload)
 
     @api.model
     def get_todays_alarms(self):
@@ -422,7 +428,7 @@ class AdvancedAlarm(models.Model):
                 bus_channel = f"advanced_alarms_{user.id}"
                 payload = {
                     'type': 'cleanup_reminder',
-                    'message': _("You have accumulated finished alarms or timers. Please clean them up to declutter your workspace.")
+                    'message': self.env._("You have accumulated finished alarms or timers. Please clean them up to declutter your workspace.")
                 }
                 self.env['bus.bus']._sendone(bus_channel, 'notification', payload)
 
@@ -534,7 +540,9 @@ class AdvancedAlarm(models.Model):
                 'name': clock.name,
                 'tz': clock.timezone,
                 'dst_mode': clock.dst_mode,
-                'is_pinned': is_pinned
+                'time_format': clock.time_format,
+                'theme_color': clock.theme_color,
+                'is_pinned': is_pinned,
             })
         return result
 

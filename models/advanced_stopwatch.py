@@ -135,7 +135,6 @@ class AdvancedStopwatch(models.Model):
 
     def _send_bus_notification(self, action_type):
         self.ensure_one()
-        bus_channel = f"advanced_alarms_{self.user_id.id}"
         payload = {
             'type': 'stopwatch_update',
             'id': self.id,
@@ -149,7 +148,7 @@ class AdvancedStopwatch(models.Model):
             'alert_interval': self.alert_interval,
             'show_in_systray': self.show_in_systray,
         }
-        self.env['bus.bus']._sendone(bus_channel, 'notification', payload)
+        self.env['bus.bus']._sendone(self.user_id.partner_id, 'advanced_alarms/update', payload)
 
     @api.model
     def get_active_stopwatches(self):

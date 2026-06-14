@@ -10,90 +10,148 @@
  */
 
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
-import { Component } from "@odoo/owl";
+import { Component, useState, onWillStart } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-import { DateTimeInput } from "@web/core/datetime/datetime_input";
 import { localization } from "@web/core/l10n/localization";
-import { DateTimePicker } from "@web/core/datetime/datetime_picker";
-import { DateTimePickerPopover } from "@web/core/datetime/datetime_picker_popover";
-import { patch } from "@web/core/utils/patch";
+import { deserializeDateTime } from "@web/core/l10n/dates";
 
 const { DateTime } = luxon;
 
-// Patching the core DateTimePicker logic to support hiding calendar
-if (DateTimePicker.props && !DateTimePicker.props.showCalendar) {
-    const showCalendarProp = { type: Boolean, optional: true };
-    DateTimePicker.props.showCalendar = showCalendarProp;
-    DateTimePicker.defaultProps.showCalendar = true;
-
-    if (DateTimeInput.props) {
-        DateTimeInput.props.showCalendar = showCalendarProp;
-    }
-
-    if (DateTimePickerPopover.props && DateTimePickerPopover.props.pickerProps) {
-        DateTimePickerPopover.props.pickerProps.shape = DateTimePicker.props;
-    }
-
-    patch(DateTimePicker.prototype, {
-        setup() {
-            super.setup(...arguments);
-            if (!this.props.showCalendar && (!this.props.value || (Array.isArray(this.props.value) && !this.props.value[0]))) {
-                const now = DateTime.local();
-                if (this.props.onSelect) {
-                    Promise.resolve().then(() => {
-                        if (this.props.onSelect) {
-                            this.props.onSelect(now);
-                        }
-                    });
-                }
-            }
-        }
-    });
-}
-
 export class TimePickerField extends Component {
     static template = "advanced_alarms.TimePickerField";
-    static components = { DateTimeInput };
     static props = {
         ...standardFieldProps,
         placeholder: { type: String, optional: true },
     };
 
-    get datePickerProps() {
-        const val = this.props.record.data[this.props.name];
-        let value = null;
-        if (val) {
-            value = val;
-        } else {
-            value = DateTime.local();
-        }
+    setup() {
+        this.state = useState({ 
+            hour: "00", 
+            minute: "00", 
+            ampm: "AM",
+            showHourDropdown: false, 
+            showMinuteDropdown: false,
+            showAmPmDropdown: false
+        });
 
-        return {
-            value: value,
-            type: "datetime",
-            showCalendar: false, // Hides calendar using SCSS
-            format: localization.timeFormat,
-            rounding: 1, // Allow minute-by-minute selection
-            placeholder: this.props.placeholder || "",
-            onApply: (newValue) => {
-                const baseDate = this.props.record.data[this.props.name] || DateTime.local();
-                const updatedVal = baseDate.set({
-                    hour: newValue ? newValue.hour : 12,
-                    minute: newValue ? newValue.minute : 0,
-                    second: 0,
-                    millisecond: 0
-                });
-                this.props.record.update({ [this.props.name]: updatedVal });
-            },
-        };
+        onWillStart(() => {
+            this.initTime();
+        });
+    }
+
+    initTime() {
+        const val = this.props.record.data[this.props.name];
+        let dt;
+        if (val) {
+            dt = deserializeDateTime(val);
+        }
+        if (!dt || !dt.isValid) {
+            dt = DateTime.local();
+        }
+        if (this.is12Hour) {
+            let h12 = dt.hour % 12;
+            if (h12 === 0) h12 = 12;
+            this.state.hour = h12.toString().padStart(2, '0');
+            this.state.ampm = dt.hour >= 12 ? "PM" : "AM";
+        } else {
+            this.state.hour = dt.hour.toString().padStart(2, '0');
+        }
+        this.state.minute = dt.minute.toString().padStart(2, '0');
+    }
+
+    get is12Hour() {
+        return localization.timeFormat.includes("a") || localization.timeFormat.includes("A") || localization.timeFormat.includes("p");
     }
 
     get formattedTime() {
         const val = this.props.record.data[this.props.name];
         if (val) {
-            return val.toFormat(localization.timeFormat);
+            const dt = deserializeDateTime(val);
+            if (dt && dt.isValid) {
+                return dt.toFormat(localization.timeFormat);
+            }
         }
         return "";
+    }
+
+    onTimeChange() {
+        let h = parseInt(this.state.hour, 10);
+        let m = parseInt(this.state.minute, 10);
+        
+        if (isNaN(h)) h = 0;
+        if (isNaN(m)) m = 0;
+        
+        if (this.is12Hour) {
+            if (h > 12) h = 12;
+            if (h < 1) h = 1;
+        } else {
+            if (h > 23) h = 23;
+            if (h < 0) h = 0;
+        }
+        
+        if (m > 59) m = 59;
+        if (m < 0) m = 0;
+        
+        // Re-pad the state
+        this.state.hour = h.toString().padStart(2, '0');
+        this.state.minute = m.toString().padStart(2, '0');
+        
+        let actualHour = h;
+        if (this.is12Hour) {
+            if (this.state.ampm === "PM" && h < 12) actualHour = h + 12;
+            if (this.state.ampm === "AM" && h === 12) actualHour = 0;
+        }
+        
+        const val = this.props.record.data[this.props.name];
+        let baseDate;
+        if (val) {
+            baseDate = deserializeDateTime(val);
+        }
+        if (!baseDate || !baseDate.isValid) {
+            baseDate = DateTime.local();
+        }
+
+        const updatedVal = baseDate.set({
+            hour: actualHour,
+            minute: m,
+            second: 0,
+            millisecond: 0
+        });
+
+        this.props.record.update({ [this.props.name]: updatedVal });
+    }
+
+    setHour(h) {
+        this.state.hour = h.toString().padStart(2, '0');
+        this.state.showHourDropdown = false;
+        this.onTimeChange();
+    }
+
+    setMinute(m) {
+        this.state.minute = m.toString().padStart(2, '0');
+        this.state.showMinuteDropdown = false;
+        this.onTimeChange();
+    }
+
+    setAmPm(val) {
+        this.state.ampm = val;
+        this.state.showAmPmDropdown = false;
+        this.onTimeChange();
+    }
+
+    onHourBlur() {
+        this.state.showHourDropdown = false;
+        this.onTimeChange();
+    }
+
+    onMinuteBlur() {
+        this.state.showMinuteDropdown = false;
+        this.onTimeChange();
+    }
+    
+    onAmPmBlur() {
+        this.state.showAmPmDropdown = false;
+        this.onTimeChange();
     }
 }
 

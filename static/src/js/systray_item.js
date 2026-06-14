@@ -80,9 +80,32 @@ export class AdvancedAlarmsSystrayItem extends Component {
             await this.loadData();
             
             // Connect to bus channel
-            const channel = `advanced_alarms_${session.uid}`;
-            this.busService.addChannel(channel);
-            this.busService.addEventListener("notification", this.onBusNotification.bind(this));
+            this.busService.subscribe("advanced_alarms/update", (payload) => {
+                let shouldReload = false;
+                
+                if (payload.type === 'alarm_update') {
+                    shouldReload = true;
+                } else if (payload.type === 'timer_update') {
+                    shouldReload = true;
+                } else if (payload.type === 'stopwatch_update') {
+                    shouldReload = true;
+                } else if (payload.type === 'cleanup_reminder') {
+                    this.addNotification({
+                        title: "Workspace Cleanup",
+                        message: payload.message,
+                        type: 'stopwatch',
+                        is_critical: false,
+                        expires: true,
+                        expire_duration: 10,
+                    });
+                }
+                
+                this.env.services.notification.add("Live Update Triggered!", { type: "info" });
+                
+                if (shouldReload) {
+                    this.loadData();
+                }
+            });
             
             // Start the tick timer (every 100ms for smooth UI animations/stopwatch)
             this.ticker = setInterval(() => this.tick(), 100);
@@ -128,9 +151,10 @@ export class AdvancedAlarmsSystrayItem extends Component {
         );
     }
 
-    getCityTime(tz, offsetMinutes = 0) {
+    getCityTime(tz, offsetMinutes = 0, timeFormat = '12h') {
+        const is12Hour = timeFormat === '12h';
         if (tz === 'local') {
-            return new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }).format(new Date());
+            return new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: is12Hour }).format(new Date());
         }
         try {
             const localDate = this.getShiftedDate(tz, offsetMinutes);
@@ -138,7 +162,7 @@ export class AdvancedAlarmsSystrayItem extends Component {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit',
-                hour12: true
+                hour12: is12Hour
             }).format(localDate);
         } catch (e) {
             return '--:--:--';
@@ -247,34 +271,7 @@ export class AdvancedAlarmsSystrayItem extends Component {
         this.state.hasActiveRinging = ringingCount > 0;
     }
 
-    // Bus listener
-    onBusNotification({ detail }) {
-        let shouldReload = false;
-        for (const message of detail) {
-            if (message.type === 'notification' && message.payload) {
-                const payload = message.payload;
-                if (payload.type === 'alarm_update') {
-                    shouldReload = true;
-                } else if (payload.type === 'timer_update') {
-                    shouldReload = true;
-                } else if (payload.type === 'stopwatch_update') {
-                    shouldReload = true;
-                } else if (payload.type === 'cleanup_reminder') {
-                    this.addNotification({
-                        title: "Workspace Cleanup",
-                        message: payload.message,
-                        type: 'stopwatch',
-                        is_critical: false,
-                        expires: true,
-                        expire_duration: 10,
-                    });
-                }
-            }
-        }
-        if (shouldReload) {
-            this.loadData();
-        }
-    }
+
 
     onBeforeOpen() {
         this.loadUserSettings();
@@ -313,9 +310,11 @@ export class AdvancedAlarmsSystrayItem extends Component {
         this.state.now = now.getTime(); // Make UI reactive
         
         // Update floating clock dynamic time display
-        const nowLuxon = luxon.DateTime.now();
-        this.state.floatingClockTime = nowLuxon.toFormat('hh:mm:ss a');
-        this.state.floatingClockDate = nowLuxon.toFormat('EEE, MMM dd, yyyy');
+        this.state.floatingClockDate = this.getCityDate('local', 0);
+        
+        // Format time based on global setting if we added it, but default to 12h or use localization
+        const is12Hour = this.state.userSettings?.local_time_format === '24h' ? false : true;
+        this.state.floatingClockTime = this.getCityTime('local', 0, is12Hour ? '12h' : '24h');
 
         // Check alarm ring duration limit (in seconds)
         const limitSec = parseInt(this.state.userSettings.alarm_ring_duration) || 60;

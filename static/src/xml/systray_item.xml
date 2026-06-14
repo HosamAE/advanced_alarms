@@ -106,7 +106,7 @@
                                             <div class="city-offset text-muted" style="font-size: 0.75rem;" t-esc="getCityOffset(city.tz)"/>
                                         </div>
                                         <div class="d-flex align-items-center gap-3">
-                                            <div class="city-time fw-bold text-dark fs-5" t-esc="getCityTime(city.tz, city.dstOffset)"/>
+                                            <div class="city-time fw-bold text-dark fs-5" t-esc="getCityTime(city.tz, city.dstOffset, city.time_format)"/>
                                             <i t-attf-class="fa #{isClockFloating(city.id) ? 'fa-thumb-tack text-primary' : 'fa-thumb-tack text-muted'}" style="font-size: 0.95rem;"></i>
                                         </div>
                                     </div>
@@ -246,7 +246,7 @@
                     </div>
                     <div class="notif-body text-center py-2">
                         <div class="floating-clock-time fw-bold text-primary font-monospace fs-4">
-                            <t t-esc="getCityTime(clock.tz, clock.dstOffset)"/>
+                            <t t-esc="getCityTime(clock.tz, clock.dstOffset, clock.time_format)"/>
                         </div>
                         <div class="floating-clock-date text-muted d-flex justify-content-center align-items-center gap-2" style="font-size: 0.65rem;">
                             <t t-esc="getCityDate(clock.tz, clock.dstOffset)"/>
@@ -310,14 +310,47 @@
 
     <!-- Custom Time Picker Widget Template -->
     <t t-name="advanced_alarms.TimePickerField" owl="1">
-        <div class="o_field_time_picker_only d-flex align-items-center">
+        <div class="o_field_time_picker_only d-flex align-items-center gap-2">
             <t t-if="props.readonly">
                 <span class="o_field_widget" t-esc="formattedTime"/>
             </t>
             <t t-else="">
-                <div class="o_time_picker_input_container position-relative flex-grow-1">
-                    <DateTimeInput t-props="datePickerProps"/>
-                    <i class="fa fa-clock-o o_time_picker_icon position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #666;"/>
+                <div class="position-relative">
+                    <input type="text" class="form-control text-center px-1" t-model="state.hour" t-on-focus="() => state.showHourDropdown = true" t-on-blur="onHourBlur" style="width: 55px;" maxlength="2"/>
+                    <div t-if="state.showHourDropdown" class="position-absolute bg-white border rounded shadow-sm" style="max-height: 150px; overflow-y: auto; width: 100%; top: 100%; left: 0; z-index: 1050;">
+                        <t t-if="is12Hour">
+                            <t t-foreach="Array.from({length: 12}, (_, i) => i + 1)" t-as="h" t-key="h">
+                                <div class="dropdown-item px-2 py-1 cursor-pointer text-center" style="font-size: 0.9rem;" t-on-mousedown.prevent="() => this.setHour(h)">
+                                    <t t-esc="h.toString().padStart(2, '0')"/>
+                                </div>
+                            </t>
+                        </t>
+                        <t t-else="">
+                            <t t-foreach="Array.from({length: 24}, (_, i) => i)" t-as="h" t-key="h">
+                                <div class="dropdown-item px-2 py-1 cursor-pointer text-center" style="font-size: 0.9rem;" t-on-mousedown.prevent="() => this.setHour(h)">
+                                    <t t-esc="h.toString().padStart(2, '0')"/>
+                                </div>
+                            </t>
+                        </t>
+                    </div>
+                </div>
+                <span class="fw-bold">:</span>
+                <div class="position-relative">
+                    <input type="text" class="form-control text-center px-1" t-model="state.minute" t-on-focus="() => state.showMinuteDropdown = true" t-on-blur="onMinuteBlur" style="width: 55px;" maxlength="2"/>
+                    <div t-if="state.showMinuteDropdown" class="position-absolute bg-white border rounded shadow-sm" style="max-height: 150px; overflow-y: auto; width: 100%; top: 100%; left: 0; z-index: 1050;">
+                        <t t-foreach="Array.from({length: 60}, (_, i) => i)" t-as="m" t-key="m">
+                            <div class="dropdown-item px-2 py-1 cursor-pointer text-center" style="font-size: 0.9rem;" t-on-mousedown.prevent="() => this.setMinute(m)">
+                                <t t-esc="m.toString().padStart(2, '0')"/>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+                <div t-if="is12Hour" class="position-relative ms-1">
+                    <input type="text" class="form-control text-center px-1 cursor-pointer" t-model="state.ampm" t-on-focus="() => state.showAmPmDropdown = true" t-on-blur="onAmPmBlur" style="width: 45px;" readonly="1"/>
+                    <div t-if="state.showAmPmDropdown" class="position-absolute bg-white border rounded shadow-sm" style="width: 100%; top: 100%; left: 0; z-index: 1050;">
+                        <div class="dropdown-item px-2 py-1 cursor-pointer text-center fw-bold" style="font-size: 0.8rem;" t-on-mousedown.prevent="() => this.setAmPm('AM')">AM</div>
+                        <div class="dropdown-item px-2 py-1 cursor-pointer text-center fw-bold" style="font-size: 0.8rem;" t-on-mousedown.prevent="() => this.setAmPm('PM')">PM</div>
+                    </div>
                 </div>
             </t>
         </div>
@@ -345,4 +378,3 @@
         </div>
     </t>
 </templates>
-

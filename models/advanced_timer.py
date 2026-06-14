@@ -32,7 +32,13 @@ class AdvancedTimer(models.Model):
     start_time = fields.Datetime(string='Start Time')
     paused_time = fields.Datetime(string='Paused Time')
     accumulated_paused = fields.Integer(string='Accumulated Paused (Seconds)', default=0)
-    sound_id = fields.Many2one('advanced.alarm.sound', string='Sound')
+    @api.model
+    def _default_sound_id(self):
+        if hasattr(self.env.user, 'timer_sound_id') and self.env.user.timer_sound_id:
+            return self.env.user.timer_sound_id.id
+        return self.env.company.advanced_timer_sound_id.id
+
+    sound_id = fields.Many2one('advanced.alarm.sound', string='Sound', default=_default_sound_id)
 
     @api.depends('duration')
     def _compute_duration_parts(self):
@@ -122,7 +128,6 @@ class AdvancedTimer(models.Model):
 
     def _send_bus_notification(self, action_type):
         self.ensure_one()
-        bus_channel = f"advanced_alarms_{self.user_id.id}"
         payload = {
             'type': 'timer_update',
             'id': self.id,
@@ -135,7 +140,7 @@ class AdvancedTimer(models.Model):
             'paused_time': fields.Datetime.to_string(self.paused_time) if self.paused_time else False,
             'sound_src': f"/web/content/advanced.alarm.sound/{self.sound_id.id}/file" if self.sound_id else "",
         }
-        self.env['bus.bus']._sendone(bus_channel, 'notification', payload)
+        self.env['bus.bus']._sendone(self.user_id.partner_id, 'advanced_alarms/update', payload)
 
     @api.model
     def get_active_timers(self):

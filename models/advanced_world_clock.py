@@ -27,6 +27,17 @@ class AdvancedWorldClock(models.Model):
         ('force_sub', 'Force -1 Hour')
     ], string='DST Mode', default='auto', required=True)
     
+    time_format = fields.Selection([
+        ('12h', '12 Hours (AM/PM)'),
+        ('24h', '24 Hours')
+    ], string='Time Format', default='12h', required=True)
+    
+    theme_color = fields.Selection([
+        ('dark', 'Dark Theme'),
+        ('light', 'Light Theme'),
+        ('primary', 'Primary Color'),
+    ], string='Theme Color', default='dark')
+    
     is_pinned_by_default = fields.Boolean(
         string='Pinned by Default', 
         default=False,

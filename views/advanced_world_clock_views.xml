@@ -40,11 +40,13 @@
                     <group>
                         <group>
                             <field name="timezone"/>
-                            <field name="sequence"/>
+                            <field name="dst_mode"/>
+                            <field name="time_format" widget="radio"/>
                         </group>
                         <group>
-                            <field name="dst_mode"/>
                             <field name="is_pinned_by_default"/>
+                            <field name="theme_color"/>
+                            <field name="sequence"/>
                             <field name="active" invisible="1"/>
                         </group>
                     </group>
