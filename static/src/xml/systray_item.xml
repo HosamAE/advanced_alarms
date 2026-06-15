@@ -238,9 +238,7 @@
                     <div class="notif-header w-100 d-flex justify-content-between align-items-center border-bottom pb-1 mb-1" style="font-size: 0.75rem;">
                         <span class="fw-bold text-primary"><i class="fa fa-clock-o me-1"></i><t t-esc="clock.name"/></span>
                         <div class="d-flex align-items-center gap-1">
-                            <button class="btn btn-sm btn-link p-0 text-muted" title="DST Setting" t-on-click="() => this.cycleDst(clock)">
-                                <i class="fa fa-cog"></i>
-                            </button>
+
                             <button class="btn-close-notif border-0 bg-transparent text-muted" t-on-click="() => this.toggleFloatingClock(clock.id)" style="font-size: 1.1rem; line-height: 1;">×</button>
                         </div>
                     </div>
