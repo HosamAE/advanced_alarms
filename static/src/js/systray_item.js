@@ -351,6 +351,12 @@ export class AdvancedAlarmsSystrayItem extends Component {
             }
         });
 
+        // Run heavy alarm/timer checking once per second to save CPU
+        if (this.lastHeavyTick && (now - this.lastHeavyTick) < 1000) {
+            return;
+        }
+        this.lastHeavyTick = now;
+
         // 1. Check Alarms
         this.state.alarms.forEach(alarm => {
             if (alarm.state === 'done' || alarm.state === 'muted') return;

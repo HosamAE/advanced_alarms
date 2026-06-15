@@ -20,6 +20,7 @@ class AdvancedAlarm(models.Model):
     name = fields.Char(string='Alarm Title', required=True)
     user_id = fields.Many2one('res.users', string='Assigned User', default=lambda self: self.env.user, index=True)
     group_ids = fields.Many2many('res.groups', string='Target Groups', help='If selected, this alarm will be visible to all members of these groups.')
+    alarm_date = fields.Date(string='Alarm Date', default=fields.Date.context_today)
     alarm_time = fields.Datetime(string='Alarm Time', required=True, index=True, default=fields.Datetime.now)
     message = fields.Text(string='Message')
     is_critical = fields.Boolean(string='Critical Alarm', default=False)
@@ -130,6 +131,19 @@ class AdvancedAlarm(models.Model):
     res_model = fields.Char(string='Related Document Model', index=True)
     res_id = fields.Integer(string='Related Document ID', index=True)
     res_name = fields.Char(string='Related Document Name')
+
+    @api.onchange('alarm_date')
+    def _onchange_alarm_date(self):
+        for record in self:
+            if record.alarm_date:
+                user_tz = pytz.timezone(self.env.user.tz or 'UTC')
+                if record.alarm_time:
+                    local_dt = pytz.utc.localize(record.alarm_time).astimezone(user_tz)
+                    new_local_dt = user_tz.localize(datetime.combine(record.alarm_date, local_dt.time()))
+                    record.alarm_time = new_local_dt.astimezone(pytz.utc).replace(tzinfo=None)
+                else:
+                    new_local_dt = user_tz.localize(datetime.combine(record.alarm_date, datetime.now().time().replace(hour=12, minute=0, second=0, microsecond=0)))
+                    record.alarm_time = new_local_dt.astimezone(pytz.utc).replace(tzinfo=None)
 
     @api.constrains('pre_alarm_duration')
     def _check_pre_alarm_duration(self):
@@ -256,9 +270,13 @@ class AdvancedAlarm(models.Model):
                 if now_local < base_time:
                     return base_time.astimezone(pytz.utc).replace(tzinfo=None)
                 
-                next_intraday = base_time
-                while next_intraday <= now_local:
-                    next_intraday += interval_delta
+                diff_seconds = (now_local - base_time).total_seconds()
+                interval_seconds = interval_delta.total_seconds()
+                if interval_seconds > 0:
+                    cycles = int(diff_seconds // interval_seconds)
+                    next_intraday = base_time + interval_delta * (cycles + 1)
+                else:
+                    next_intraday = base_time
                 
                 if next_intraday.date() == now_local.date():
                     return next_intraday.astimezone(pytz.utc).replace(tzinfo=None)

@@ -44,6 +44,7 @@
                     </div>
                     <group>
                         <group string="Alarm Settings">
+                            <field name="alarm_date" invisible="recurrence_type not in ('once', 'scrum', 'custom')"/>
                             <field name="alarm_time" widget="time_picker_widget"/>
                             <field name="sound_id" domain="[('sound_type', '=', 'alarm')]" placeholder="Default Sound"/>
                             <field name="is_critical" widget="boolean_toggle"/>
