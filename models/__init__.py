@@ -12,6 +12,7 @@ from . import advanced_alarm_sound
 from . import res_users
 from . import res_company
 from . import res_config_settings
+from . import ir_http
 from . import advanced_world_clock
 from . import advanced_stopwatch_lap
 from . import advanced_alarm_cycle_day

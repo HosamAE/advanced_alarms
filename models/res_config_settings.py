@@ -29,6 +29,11 @@ class ResConfigSettings(models.TransientModel):
     snooze_duration = fields.Integer(string='Default Snooze Duration (Minutes)', default=5, config_parameter='advanced_alarms.snooze_duration')
     snooze_limit = fields.Integer(string='Default Snooze Limit (Times)', default=3, config_parameter='advanced_alarms.snooze_limit')
     stopwatch_alert_interval = fields.Integer(string='Default Stopwatch Alert Interval (Seconds)', default=3600, config_parameter='advanced_alarms.stopwatch_alert_interval')
+    time_format_preference = fields.Selection([
+        ('system', 'System Default (Auto-detect)'),
+        ('12h', '12-Hour Format (AM/PM)'),
+        ('24h', '24-Hour Format')
+    ], string='Time Picker Format', default='system', config_parameter='advanced_alarms.time_format_preference')
 
     advanced_alarm_sound_id = fields.Many2one('advanced.alarm.sound', related='company_id.advanced_alarm_sound_id', readonly=False)
     advanced_timer_sound_id = fields.Many2one('advanced.alarm.sound', related='company_id.advanced_timer_sound_id', readonly=False)
