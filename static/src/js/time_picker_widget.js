@@ -12,6 +12,7 @@
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 import { Component, useState, useExternalListener, useRef } from "@odoo/owl";
 import { registry } from "@web/core/registry";
+import { session } from "@web/session";
 import { DateTimeInput } from "@web/core/datetime/datetime_input";
 import { localization } from "@web/core/l10n/localization";
 import { DateTimePicker } from "@web/core/datetime/datetime_picker";
@@ -60,7 +61,6 @@ export class TimePickerField extends Component {
 
     setup() {
         super.setup(...arguments);
-        this.hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
         this.minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
         this.state = useState({
             openDropdown: null,
@@ -101,9 +101,41 @@ export class TimePickerField extends Component {
         return val;
     }
 
+    get is12HourFormat() {
+        const timeFormatPref = session.advanced_alarms_time_format || 'system';
+        if (timeFormatPref === '12h') return true;
+        if (timeFormatPref === '24h') return false;
+        return localization.timeFormat.includes("a") || localization.timeFormat.includes("A") || localization.timeFormat.includes("p");
+    }
+
+    get hours() {
+        if (this.is12HourFormat) {
+            return Array.from({ length: 12 }, (_, i) => String(i === 0 ? 12 : i).padStart(2, '0'));
+        }
+        return Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+    }
+
+    get currentAmPm() {
+        const val = this.parsedDate;
+        return val && val.hour >= 12 ? 'PM' : 'AM';
+    }
+
+    toggleAmPm() {
+        const val = this.parsedDate;
+        let h = val ? val.hour : 12;
+        h = (h + 12) % 24;
+        this.updateTime(h, this.currentMinute, true); // direct hour override
+    }
+
     get currentHour() {
         const val = this.parsedDate;
-        return val ? String(val.hour).padStart(2, '0') : "12";
+        if (!val) return "12";
+        if (this.is12HourFormat) {
+            let h = val.hour % 12;
+            if (h === 0) h = 12;
+            return String(h).padStart(2, '0');
+        }
+        return String(val.hour).padStart(2, '0');
     }
 
     get currentMinute() {
@@ -119,9 +151,18 @@ export class TimePickerField extends Component {
         this.updateTime(this.currentHour, ev.target.value);
     }
 
-    updateTime(hourStr, minuteStr) {
-        const h = parseInt(hourStr, 10) || 0;
+    updateTime(hourStr, minuteStr, absoluteHour = false) {
+        let h = parseInt(hourStr, 10) || 0;
         const m = parseInt(minuteStr, 10) || 0;
+
+        if (!absoluteHour && this.is12HourFormat) {
+            const isPM = this.currentAmPm === 'PM';
+            if (h === 12) {
+                h = isPM ? 12 : 0;
+            } else {
+                if (isPM) h += 12;
+            }
+        }
 
         const baseDate = this.props.record.data[this.props.name] || DateTime.local();
         const updatedVal = baseDate.set({
@@ -137,7 +178,11 @@ export class TimePickerField extends Component {
     get formattedTime() {
         const val = this.props.record.data[this.props.name];
         if (val) {
-            return val.toFormat(localization.timeFormat);
+            if (this.is12HourFormat) {
+                return val.toFormat("hh:mm a");
+            } else {
+                return val.toFormat("HH:mm");
+            }
         }
         return "";
     }
