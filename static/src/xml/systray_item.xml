@@ -91,7 +91,7 @@
                         <!-- WORLD CLOCK TAB -->
                         <div t-if="state.activeTab === 'world_clock'" class="tab-pane">
                             <div t-attf-class="world-clock-main text-center p-3 mb-3 rounded border cursor-pointer #{isClockFloating('local') ? 'border-primary bg-light' : 'bg-white'}" t-on-click="() => this.toggleFloatingClock('local')">
-                                <div class="digital-clock-large fw-bold fs-2 text-primary" t-esc="state.floatingClockTime"/>
+                                <div class="digital-clock-large fw-bold fs-1 text-primary" t-esc="state.floatingClockTime"/>
                                 <div class="digital-clock-date text-muted fs-6" t-esc="state.floatingClockDate"/>
                                 <div class="mt-2 text-primary fs-7 fw-semibold">
                                     <i t-attf-class="fa #{isClockFloating('local') ? 'fa-eye' : 'fa-eye-slash'} me-1"></i>
@@ -228,7 +228,7 @@
                         </div>
                     </div>
                     <div class="notif-body text-center py-2">
-                        <div class="floating-clock-time fw-bold text-primary font-monospace fs-2" t-esc="state.floatingClockTime"/>
+                        <div class="floating-clock-time fw-bold text-primary font-monospace fs-1" t-esc="state.floatingClockTime"/>
                         <div class="floating-clock-date text-muted d-flex justify-content-center align-items-center gap-2" style="font-size: 0.65rem;" t-esc="state.floatingClockDate"/>
                     </div>
                 </div>
@@ -247,7 +247,7 @@
                         </div>
                     </div>
                     <div class="notif-body text-center py-2">
-                        <div class="floating-clock-time fw-bold text-primary font-monospace fs-4">
+                        <div class="floating-clock-time fw-bold text-primary font-monospace fs-2">
                             <t t-esc="getCityTime(clock.tz, clock.dstOffset)"/>
                         </div>
                         <div class="floating-clock-date text-muted d-flex justify-content-center align-items-center gap-2" style="font-size: 0.65rem;">
