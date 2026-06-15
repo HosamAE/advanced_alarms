@@ -12,6 +12,7 @@
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 import { Component, useState, useExternalListener, useRef } from "@odoo/owl";
 import { registry } from "@web/core/registry";
+import { session } from "@web/session";
 import { DateTimeInput } from "@web/core/datetime/datetime_input";
 import { localization } from "@web/core/l10n/localization";
 import { DateTimePicker } from "@web/core/datetime/datetime_picker";
@@ -60,7 +61,15 @@ export class TimePickerField extends Component {
 
     setup() {
         super.setup(...arguments);
-        this.is12HourFormat = localization.timeFormat.includes("h") || localization.timeFormat.includes("a");
+        const timeFormatPref = session.advanced_alarms_time_format || 'system';
+        if (timeFormatPref === '12h') {
+            this.is12HourFormat = true;
+        } else if (timeFormatPref === '24h') {
+            this.is12HourFormat = false;
+        } else {
+            this.is12HourFormat = localization.timeFormat.includes("h") || localization.timeFormat.includes("a");
+        }
+        
         if (this.is12HourFormat) {
             this.hours = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
         } else {
