@@ -20,6 +20,7 @@ class AdvancedAlarm(models.Model):
     name = fields.Char(string='Alarm Title', required=True)
     user_id = fields.Many2one('res.users', string='Assigned User', default=lambda self: self.env.user, index=True)
     group_ids = fields.Many2many('res.groups', string='Target Groups', help='If selected, this alarm will be visible to all members of these groups.')
+    alarm_date = fields.Date(string='Alarm Date', default=fields.Date.context_today)
     alarm_time = fields.Datetime(string='Alarm Time', required=True, index=True)
     message = fields.Text(string='Message')
     is_critical = fields.Boolean(string='Critical Alarm', default=False)
@@ -130,6 +131,19 @@ class AdvancedAlarm(models.Model):
     res_model = fields.Char(string='Related Document Model', index=True)
     res_id = fields.Integer(string='Related Document ID', index=True)
     res_name = fields.Char(string='Related Document Name')
+
+    @api.onchange('alarm_date')
+    def _onchange_alarm_date(self):
+        for record in self:
+            if record.alarm_date:
+                user_tz = pytz.timezone(self.env.user.tz or 'UTC')
+                if record.alarm_time:
+                    local_dt = pytz.utc.localize(record.alarm_time).astimezone(user_tz)
+                    new_local_dt = user_tz.localize(datetime.combine(record.alarm_date, local_dt.time()))
+                    record.alarm_time = new_local_dt.astimezone(pytz.utc).replace(tzinfo=None)
+                else:
+                    new_local_dt = user_tz.localize(datetime.combine(record.alarm_date, datetime.now().time().replace(hour=12, minute=0, second=0, microsecond=0)))
+                    record.alarm_time = new_local_dt.astimezone(pytz.utc).replace(tzinfo=None)
 
     @api.constrains('pre_alarm_duration')
     def _check_pre_alarm_duration(self):
