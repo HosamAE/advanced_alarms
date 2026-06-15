@@ -37,10 +37,8 @@
         <field name="arch" type="xml">
             <group name="preferences" position="after">
                 <group string="Time &amp; Alarms Sound Settings">
-                    <group>
-                        <field name="alarm_sound_id"/>
-                        <field name="timer_sound_id"/>
-                    </group>
+                    <field name="alarm_sound_id"/>
+                    <field name="timer_sound_id"/>
                 </group>
             </group>
         </field>

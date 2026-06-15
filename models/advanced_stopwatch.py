@@ -149,7 +149,7 @@ class AdvancedStopwatch(models.Model):
             'alert_interval': self.alert_interval,
             'show_in_systray': self.show_in_systray,
         }
-        self.env['bus.bus']._sendone(bus_channel, 'notification', payload)
+        self.env['bus.bus']._sendone(self.user_id.partner_id, 'advanced_alarms/update', payload)
 
     @api.model
     def get_active_stopwatches(self):

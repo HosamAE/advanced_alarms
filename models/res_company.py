@@ -12,5 +12,6 @@ from odoo import models, fields
 class ResCompany(models.Model):
     _inherit = 'res.company'
 
+    advanced_alarm_sound_id = fields.Many2one('advanced.alarm.sound', string='Default Alarm Sound', domain="[('sound_type', '=', 'alarm')]")
     advanced_timer_sound_id = fields.Many2one('advanced.alarm.sound', string='Default Timer Sound', domain="[('sound_type', '=', 'timer')]")
     advanced_notif_sound_id = fields.Many2one('advanced.alarm.sound', string='Default Notification Sound', domain="[('sound_type', '=', 'notif')]")

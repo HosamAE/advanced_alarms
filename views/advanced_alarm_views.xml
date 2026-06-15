@@ -44,6 +44,7 @@
                     </div>
                     <group>
                         <group string="Alarm Settings">
+                            <field name="alarm_date" invisible="recurrence_type not in ('once', 'scrum', 'custom')"/>
                             <field name="alarm_time" widget="time_picker_widget"/>
                             <field name="sound_id" domain="[('sound_type', '=', 'alarm')]" placeholder="Default Sound"/>
                             <field name="is_critical" widget="boolean_toggle"/>
@@ -168,11 +169,10 @@
                 <sheet>
                     <group>
                         <field name="name"/>
-                        <label for="duration_hours" string="Duration (HH:MM:SS)"/>
+                        <label for="duration_hours" string="Duration (HH:MM)"/>
                         <div class="o_row">
                             <field name="duration_hours" class="oe_inline text-center fw-bold" style="width: 3rem;" placeholder="HH"/> :
-                            <field name="duration_minutes" class="oe_inline text-center fw-bold" style="width: 3rem;" placeholder="MM"/> :
-                            <field name="duration_seconds" class="oe_inline text-center fw-bold" style="width: 3rem;" placeholder="SS"/>
+                            <field name="duration_minutes" class="oe_inline text-center fw-bold" style="width: 3rem;" placeholder="MM"/>
                         </div>
                         <field name="sound_id" domain="[('sound_type', '=', 'timer')]"/>
                     </group>

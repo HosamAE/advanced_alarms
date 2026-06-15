@@ -10,7 +10,7 @@
  */
 
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
-import { Component } from "@odoo/owl";
+import { Component, useState, useExternalListener, useRef } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { DateTimeInput } from "@web/core/datetime/datetime_input";
 import { localization } from "@web/core/l10n/localization";
@@ -53,39 +53,85 @@ if (DateTimePicker.props && !DateTimePicker.props.showCalendar) {
 
 export class TimePickerField extends Component {
     static template = "advanced_alarms.TimePickerField";
-    static components = { DateTimeInput };
     static props = {
         ...standardFieldProps,
         placeholder: { type: String, optional: true },
     };
 
-    get datePickerProps() {
-        const val = this.props.record.data[this.props.name];
-        let value = null;
-        if (val) {
-            value = val;
-        } else {
-            value = DateTime.local();
-        }
+    setup() {
+        super.setup(...arguments);
+        this.hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+        this.minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
+        this.state = useState({
+            openDropdown: null,
+        });
+        this.rootRef = useRef("root");
+        useExternalListener(window, "click", this.onWindowClick);
+    }
 
-        return {
-            value: value,
-            type: "datetime",
-            showCalendar: false, // Hides calendar using SCSS
-            format: localization.timeFormat,
-            rounding: 1, // Allow minute-by-minute selection
-            placeholder: this.props.placeholder || "",
-            onApply: (newValue) => {
-                const baseDate = this.props.record.data[this.props.name] || DateTime.local();
-                const updatedVal = baseDate.set({
-                    hour: newValue ? newValue.hour : 12,
-                    minute: newValue ? newValue.minute : 0,
-                    second: 0,
-                    millisecond: 0
-                });
-                this.props.record.update({ [this.props.name]: updatedVal });
-            },
-        };
+    onWindowClick(ev) {
+        if (this.rootRef.el && !this.rootRef.el.contains(ev.target)) {
+            this.state.openDropdown = null;
+        }
+    }
+
+    openDropdown(type) {
+        this.state.openDropdown = type;
+    }
+
+    selectHour(h) {
+        this.updateTime(h, this.currentMinute);
+        this.state.openDropdown = null;
+    }
+
+    selectMinute(m) {
+        this.updateTime(this.currentHour, m);
+        this.state.openDropdown = null;
+    }
+
+    get parsedDate() {
+        let val = this.props.record.data[this.props.name];
+        if (!val) return null;
+        if (typeof val === "string") {
+            // Odoo 19 datetime fields might be passed as strings occasionally
+            // In Odoo 19, we typically import deserializeDateTime, but since we don't have it explicitly imported here, 
+            // we can parse it using luxon DateTime from UTC to Local.
+            val = luxon.DateTime.fromSQL(val, { zone: "utc" }).setZone(luxon.Settings.defaultZone);
+        }
+        return val;
+    }
+
+    get currentHour() {
+        const val = this.parsedDate;
+        return val ? String(val.hour).padStart(2, '0') : "12";
+    }
+
+    get currentMinute() {
+        const val = this.parsedDate;
+        return val ? String(val.minute).padStart(2, '0') : "00";
+    }
+
+    onHourChange(ev) {
+        this.updateTime(ev.target.value, this.currentMinute);
+    }
+
+    onMinuteChange(ev) {
+        this.updateTime(this.currentHour, ev.target.value);
+    }
+
+    updateTime(hourStr, minuteStr) {
+        const h = parseInt(hourStr, 10) || 0;
+        const m = parseInt(minuteStr, 10) || 0;
+
+        const baseDate = this.props.record.data[this.props.name] || DateTime.local();
+        const updatedVal = baseDate.set({
+            hour: h,
+            minute: m,
+            second: 0,
+            millisecond: 0
+        });
+        
+        this.props.record.update({ [this.props.name]: updatedVal });
     }
 
     get formattedTime() {

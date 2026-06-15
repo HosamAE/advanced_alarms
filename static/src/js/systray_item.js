@@ -12,7 +12,6 @@
 import { Component, useState, onWillStart, onWillUnmount } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { session } from "@web/session";
 import { Dropdown } from "@web/core/dropdown/dropdown";
 
 // Format helper to pad numbers
@@ -78,11 +77,14 @@ export class AdvancedAlarmsSystrayItem extends Component {
         onWillStart(async () => {
             await this.loadUserSettings();
             await this.loadData();
-            
-            // Connect to bus channel
-            const channel = `advanced_alarms_${session.uid}`;
-            this.busService.addChannel(channel);
-            this.busService.addEventListener("notification", this.onBusNotification.bind(this));
+            // Listen for Bus events (real-time updates)
+            if (this.busService.subscribe) {
+                this.busService.subscribe("advanced_alarms/update", (payload) => {
+                    this.onBusNotification({ detail: [{ type: "advanced_alarms/update", payload: payload }] });
+                });
+            } else {
+                this.busService.addEventListener("advanced_alarms/update", this.onBusNotification.bind(this));
+            }
             
             // Start the tick timer (every 100ms for smooth UI animations/stopwatch)
             this.ticker = setInterval(() => this.tick(), 100);
@@ -251,7 +253,7 @@ export class AdvancedAlarmsSystrayItem extends Component {
     onBusNotification({ detail }) {
         let shouldReload = false;
         for (const message of detail) {
-            if (message.type === 'notification' && message.payload) {
+            if (message.type === 'advanced_alarms/update' && message.payload) {
                 const payload = message.payload;
                 if (payload.type === 'alarm_update') {
                     shouldReload = true;
@@ -272,6 +274,9 @@ export class AdvancedAlarmsSystrayItem extends Component {
             }
         }
         if (shouldReload) {
+            if (this.env.services.notification) {
+                this.env.services.notification.add("Live Update Triggered!", { type: "info" });
+            }
             this.loadData();
         }
     }
@@ -345,6 +350,12 @@ export class AdvancedAlarmsSystrayItem extends Component {
                 }
             }
         });
+
+        // Run heavy alarm/timer checking once per second to save CPU
+        if (this.lastHeavyTick && (now - this.lastHeavyTick) < 1000) {
+            return;
+        }
+        this.lastHeavyTick = now;
 
         // 1. Check Alarms
         this.state.alarms.forEach(alarm => {

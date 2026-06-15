@@ -8,7 +8,7 @@
 # -*- coding: utf-8 -*-
 import pytz
 from datetime import datetime, timedelta
-from odoo import models, fields, api, _
+from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 
 
@@ -20,7 +20,8 @@ class AdvancedAlarm(models.Model):
     name = fields.Char(string='Alarm Title', required=True)
     user_id = fields.Many2one('res.users', string='Assigned User', default=lambda self: self.env.user, index=True)
     group_ids = fields.Many2many('res.groups', string='Target Groups', help='If selected, this alarm will be visible to all members of these groups.')
-    alarm_time = fields.Datetime(string='Alarm Time', required=True, index=True)
+    alarm_date = fields.Date(string='Alarm Date', default=fields.Date.context_today)
+    alarm_time = fields.Datetime(string='Alarm Time', required=True, index=True, default=fields.Datetime.now)
     message = fields.Text(string='Message')
     is_critical = fields.Boolean(string='Critical Alarm', default=False)
     state = fields.Selection([
@@ -32,7 +33,13 @@ class AdvancedAlarm(models.Model):
         ('cancel', 'Cancelled')
     ], string='Status', default='pending', required=True, index=True)
     
-    sound_id = fields.Many2one('advanced.alarm.sound', string='Ringtone')
+    def _default_sound_id(self):
+        user_sound = self.env.user.alarm_sound_id
+        if user_sound:
+            return user_sound.id
+        return self.env.company.advanced_alarm_sound_id.id
+
+    sound_id = fields.Many2one('advanced.alarm.sound', string='Ringtone', default=_default_sound_id, domain="[('sound_type', '=', 'alarm')]")
     
     pre_alarm = fields.Boolean(string='Enable Pre-alarm', default=True)
     pre_alarm_duration = fields.Integer(string='Pre-alarm Time (Minutes)', default=5)
@@ -68,7 +75,7 @@ class AdvancedAlarm(models.Model):
     def _check_cycle_days_count(self):
         for record in self:
             if record.recurrence_type == 'cycle' and (record.cycle_days_count < 1 or record.cycle_days_count > 60):
-                raise ValidationError(_("Cycle Length must be between 1 and 60 days."))
+                raise ValidationError(self.env._("Cycle Length must be between 1 and 60 days."))
                 
     @api.onchange('recurrence_type', 'cycle_days_count')
     def _onchange_cycle_days_count(self):
@@ -125,11 +132,24 @@ class AdvancedAlarm(models.Model):
     res_id = fields.Integer(string='Related Document ID', index=True)
     res_name = fields.Char(string='Related Document Name')
 
+    @api.onchange('alarm_date')
+    def _onchange_alarm_date(self):
+        for record in self:
+            if record.alarm_date:
+                user_tz = pytz.timezone(self.env.user.tz or 'UTC')
+                if record.alarm_time:
+                    local_dt = pytz.utc.localize(record.alarm_time).astimezone(user_tz)
+                    new_local_dt = user_tz.localize(datetime.combine(record.alarm_date, local_dt.time()))
+                    record.alarm_time = new_local_dt.astimezone(pytz.utc).replace(tzinfo=None)
+                else:
+                    new_local_dt = user_tz.localize(datetime.combine(record.alarm_date, datetime.now().time().replace(hour=12, minute=0, second=0, microsecond=0)))
+                    record.alarm_time = new_local_dt.astimezone(pytz.utc).replace(tzinfo=None)
+
     @api.constrains('pre_alarm_duration')
     def _check_pre_alarm_duration(self):
         for record in self:
             if record.pre_alarm_duration < 0:
-                raise ValidationError(_("Pre-alarm duration cannot be negative."))
+                raise ValidationError(self.env._("Pre-alarm duration cannot be negative."))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -141,9 +161,10 @@ class AdvancedAlarm(models.Model):
     def write(self, vals):
         res = super(AdvancedAlarm, self).write(vals)
         fields_to_check = [
-            'state', 'alarm_time', 'name', 'message', 'is_critical', 'snoozed_count', 
-            'recurrence_type', 'shift_work_days', 'shift_off_days', 'shift_start_date', 
-            'intraday_repeat', 'intraday_interval', 'intraday_uom'
+            'state', 'alarm_time', 'name', 'message', 'is_critical', 'snoozed_count',
+            'recurrence_type', 'shift_work_days', 'shift_off_days', 'shift_start_date',
+            'intraday_repeat', 'intraday_interval', 'intraday_uom',
+            'ringtone_id', 'description', 'target_groups_ids', 'enable_pre_alarm', 'pre_alarm_time'
         ]
         if any(f in vals for f in fields_to_check):
             for record in self:
@@ -249,9 +270,13 @@ class AdvancedAlarm(models.Model):
                 if now_local < base_time:
                     return base_time.astimezone(pytz.utc).replace(tzinfo=None)
                 
-                next_intraday = base_time
-                while next_intraday <= now_local:
-                    next_intraday += interval_delta
+                diff_seconds = (now_local - base_time).total_seconds()
+                interval_seconds = interval_delta.total_seconds()
+                if interval_seconds > 0:
+                    cycles = int(diff_seconds // interval_seconds)
+                    next_intraday = base_time + interval_delta * (cycles + 1)
+                else:
+                    next_intraday = base_time
                 
                 if next_intraday.date() == now_local.date():
                     return next_intraday.astimezone(pytz.utc).replace(tzinfo=None)
@@ -335,7 +360,7 @@ class AdvancedAlarm(models.Model):
             'snoozed_count': self.snoozed_count,
             'snooze_limit_reached': self.snoozed_count >= int(self.env['ir.config_parameter'].sudo().get_param('advanced_alarms.snooze_limit', 3)),
         }
-        self.env['bus.bus']._sendone(bus_channel, 'notification', payload)
+        self.env['bus.bus']._sendone(self.user_id.partner_id, 'advanced_alarms/update', payload)
 
     @api.model
     def get_todays_alarms(self):
@@ -419,12 +444,11 @@ class AdvancedAlarm(models.Model):
             ])
             
             if done_alarms_count > 10 or done_timers_count > 10:
-                bus_channel = f"advanced_alarms_{user.id}"
                 payload = {
                     'type': 'cleanup_reminder',
-                    'message': _("You have accumulated finished alarms or timers. Please clean them up to declutter your workspace.")
+                    'message': self.env._("You have accumulated finished alarms or timers. Please clean them up to declutter your workspace.")
                 }
-                self.env['bus.bus']._sendone(bus_channel, 'notification', payload)
+                self.env['bus.bus']._sendone(user.partner_id, 'advanced_alarms/update', payload)
 
     @api.model
     def action_clear_muted_alarms(self):
