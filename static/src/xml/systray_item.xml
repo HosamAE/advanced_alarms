@@ -330,6 +330,9 @@
                             </t>
                         </div>
                     </div>
+                    <t t-if="is12HourFormat">
+                        <button class="btn btn-sm btn-outline-primary ms-1" t-on-click="() => this.toggleAmPm()"><t t-esc="currentAmPm"/></button>
+                    </t>
                 </div>
             </t>
         </div>
