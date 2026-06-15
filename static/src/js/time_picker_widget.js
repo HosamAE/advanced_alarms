@@ -60,7 +60,12 @@ export class TimePickerField extends Component {
 
     setup() {
         super.setup(...arguments);
-        this.hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+        this.is12HourFormat = localization.timeFormat.includes("h") || localization.timeFormat.includes("a");
+        if (this.is12HourFormat) {
+            this.hours = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
+        } else {
+            this.hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+        }
         this.minutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
         this.state = useState({
             openDropdown: null,
@@ -103,12 +108,25 @@ export class TimePickerField extends Component {
 
     get currentHour() {
         const val = this.parsedDate;
-        return val ? String(val.hour).padStart(2, '0') : "12";
+        if (!val) return this.is12HourFormat ? "12" : "12";
+        return val.toFormat(this.is12HourFormat ? "hh" : "HH");
     }
 
     get currentMinute() {
         const val = this.parsedDate;
         return val ? String(val.minute).padStart(2, '0') : "00";
+    }
+
+    get currentAmPm() {
+        const val = this.parsedDate;
+        if (!val) return "AM";
+        return val.hour >= 12 ? "PM" : "AM";
+    }
+
+    toggleAmPm() {
+        if (!this.is12HourFormat) return;
+        const newAmPm = this.currentAmPm === "AM" ? "PM" : "AM";
+        this.updateTime(this.currentHour, this.currentMinute, newAmPm);
     }
 
     onHourChange(ev) {
@@ -119,9 +137,18 @@ export class TimePickerField extends Component {
         this.updateTime(this.currentHour, ev.target.value);
     }
 
-    updateTime(hourStr, minuteStr) {
-        const h = parseInt(hourStr, 10) || 0;
+    updateTime(hourStr, minuteStr, ampmStr) {
+        let h = parseInt(hourStr, 10) || 0;
         const m = parseInt(minuteStr, 10) || 0;
+
+        if (this.is12HourFormat) {
+            const ampm = ampmStr || this.currentAmPm;
+            if (ampm === "PM" && h !== 12) {
+                h += 12;
+            } else if (ampm === "AM" && h === 12) {
+                h = 0;
+            }
+        }
 
         const baseDate = this.props.record.data[this.props.name] || DateTime.local();
         const updatedVal = baseDate.set({
