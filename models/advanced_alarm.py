@@ -270,9 +270,13 @@ class AdvancedAlarm(models.Model):
                 if now_local < base_time:
                     return base_time.astimezone(pytz.utc).replace(tzinfo=None)
                 
-                next_intraday = base_time
-                while next_intraday <= now_local:
-                    next_intraday += interval_delta
+                diff_seconds = (now_local - base_time).total_seconds()
+                interval_seconds = interval_delta.total_seconds()
+                if interval_seconds > 0:
+                    cycles = int(diff_seconds // interval_seconds)
+                    next_intraday = base_time + interval_delta * (cycles + 1)
+                else:
+                    next_intraday = base_time
                 
                 if next_intraday.date() == now_local.date():
                     return next_intraday.astimezone(pytz.utc).replace(tzinfo=None)
